@@ -4,11 +4,36 @@
 * {
   margin: 0;
   padding: 0;
+  box-sizing: border-box;
 }
 
-body{
-    background-color: #1b1b1b;
-    min-height: 100vh;
-    color: #fff;
-    font-family: "Poppins", sans-serif;
+html {
+  font-size: 16px;
+  scroll-behavior: smooth;
 }
+
+body {
+  background-color: #1b1b1b;
+  min-height: 100vh;
+  color: #fff;
+  font-family: "Poppins", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  font-size: 1rem;
+  line-height: 1.6;
+  font-weight: 400;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+}
+
+/* Ensure Poppins is applied to all text elements */
+h1, h2, h3, h4, h5, h6, p, span, div, a, button, input, textarea, select {
+  font-family: "Poppins", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+}
+
+/* Font weight utilities */
+.font-light { font-weight: 300; }
+.font-normal { font-weight: 400; }
+.font-medium { font-weight: 500; }
+.font-semibold { font-weight: 600; }
+.font-bold { font-weight: 700; }
+

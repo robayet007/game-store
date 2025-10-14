@@ -8,11 +8,7 @@
 
 body{
     background-color: #1b1b1b;
-}
-.main-container
-{
     min-height: 100vh;
-    margin: auto;
     color: #fff;
     font-family: "Poppins", sans-serif;
 }

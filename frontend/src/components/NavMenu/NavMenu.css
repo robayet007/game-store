@@ -1,6 +1,6 @@
 .navmenu-wrapper {
   position: fixed;
-  top: 90vh;
+  top: 95vh;
   left: 50%;
   transform: translate(-50%, -50%);
   width: 600px;
@@ -89,7 +89,7 @@
   .navmenu-wrapper {
     width: 95%;
     max-width: 500px;
-    top: 90vh;
+    top: 95vh;
   }
   
   .navmenu-container {
@@ -122,7 +122,7 @@
   .navmenu-wrapper {
     width: 90%;
     max-width: 400px;
-    top: 88vh;
+    top: 92vh;
   }
   
   .navmenu-container {

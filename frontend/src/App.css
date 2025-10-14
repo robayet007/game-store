@@ -1,0 +1,6 @@
+.app
+{
+    width: 100%;
+    max-width: var(--container-max);
+    margin: 0 auto;
+}

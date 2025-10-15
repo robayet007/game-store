@@ -302,7 +302,6 @@
 
 @media (max-width: 480px) {
   .carousel-wrapper {
-    margin-top: 140px; /* Even more space for mobile navbar with column layout */
     padding: 0 10px;
   }
   

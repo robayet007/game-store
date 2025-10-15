@@ -189,7 +189,7 @@ function GameShop() {
                 </div>
 
                 <div className="game-actions">
-                  <button className="play-now-btn">Shop Now</button>
+                  <button className="play-now-btn">Top Up Now</button>
                   <button className="details-btn">Details</button>
                 </div>
               </div>

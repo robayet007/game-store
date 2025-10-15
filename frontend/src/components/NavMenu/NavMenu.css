@@ -1,6 +1,6 @@
 .navmenu-wrapper {
   position: fixed;
-  bottom: 10px;
+  bottom: 0;
   left: 50%;
   transform: translate(-50%, -50%);
   width: 600px;
@@ -92,7 +92,7 @@
   .navmenu-wrapper {
     width: 95%;
     max-width: 500px;
-    bottom: 5px;
+    bottom: 0;
   }
   
   .navmenu-container {
@@ -125,7 +125,7 @@
   .navmenu-wrapper {
     width: 90%;
     max-width: 400px;
-    bottom: 5px;
+    bottom: 0;
   }
   
   .navmenu-container {
@@ -194,6 +194,7 @@
 @media (max-width: 320px) {
   .navmenu-wrapper {
     width: 85%;
+    bottom: 0;
   }
   
   .navmenu-container {

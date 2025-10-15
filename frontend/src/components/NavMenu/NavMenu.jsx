@@ -1,54 +1,79 @@
-"use client"
+"use client";
 
-import { useState } from "react";
-import { Link } from 'react-router-dom';
-import { User } from 'lucide-react';
+import { useState, useEffect } from "react";
+import { Link, useLocation } from "react-router-dom";
+import { User } from "lucide-react";
 import "./NavMenu.css";
 
 function NavMenu() {
+  const location = useLocation();
   const [activeItem, setActiveItem] = useState("home");
+
+  // Route change detect করে active item auto update করবে
+  useEffect(() => {
+    if (location.pathname === "/") {
+      setActiveItem("home");
+    } else if (location.pathname === "/games") {
+      setActiveItem("games");
+    } else if (location.pathname === "/profile") {
+      setActiveItem("profile");
+    } else {
+      setActiveItem(""); // অন্য কোনো route হলে active remove হবে
+    }
+  }, [location.pathname]);
 
   return (
     <div className="navmenu-wrapper">
       <nav className="navmenu-container">
         {/* Animated Border */}
         <div className="animated-border"></div>
-        
+
         {/* Home Link */}
-        <Link 
-          to="/" 
+        <Link
+          to="/"
           className={`navmenu-item ${activeItem === "home" ? "active" : ""}`}
-          onClick={() => setActiveItem("home")}
         >
           <div className="navmenu-icon">
-            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-              <path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/>
-              <polyline points="9 22 9 12 15 12 15 22"/>
+            <svg
+              width="24"
+              height="24"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2"
+            >
+              <path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" />
+              <polyline points="9 22 9 12 15 12 15 22" />
             </svg>
           </div>
           <span className="navmenu-text">Home</span>
         </Link>
 
         {/* Games Link */}
-        <Link 
-          to="/games" 
+        <Link
+          to="/games"
           className={`navmenu-item ${activeItem === "games" ? "active" : ""}`}
-          onClick={() => setActiveItem("games")}
         >
           <div className="navmenu-icon">
-            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-              <path d="M6 12h12M12 6v12"/>
-              <circle cx="12" cy="12" r="10"/>
+            <svg
+              width="24"
+              height="24"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2"
+            >
+              <path d="M6 12h12M12 6v12" />
+              <circle cx="12" cy="12" r="10" />
             </svg>
           </div>
           <span className="navmenu-text">Games</span>
         </Link>
 
-        {/* Avatar/Profile Link */}
-        <Link 
-          to="/profile" 
+        {/* Profile Link */}
+        <Link
+          to="/profile"
           className={`navmenu-item ${activeItem === "profile" ? "active" : ""}`}
-          onClick={() => setActiveItem("profile")}
         >
           <div className="navmenu-icon">
             <User size={24} />

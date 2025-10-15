@@ -115,12 +115,20 @@
 .game-card {
   background: rgba(255, 255, 255, 0.05);
   border-radius: 16px;
-  overflow: hidden;
+  overflow: visible;
   text-decoration: none;
   transition: all 0.3s ease;
   border: 1px solid rgba(255, 255, 255, 0.1);
   backdrop-filter: blur(10px);
+  position: relative;
 }
+
+
+
+/* border animation game card */
+
+
+/* border animation game card end */
 
 .game-card:hover {
   transform: translateY(-8px);
@@ -139,9 +147,10 @@
   height: 100%;
   object-fit: cover;
   transition: transform 0.3s ease;
+  padding: 5px;
 }
 
-.game-card:hover .game-image {
+.game-card:hover {
   transform: scale(1.05);
 }
 

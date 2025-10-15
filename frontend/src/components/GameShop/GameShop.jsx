@@ -11,7 +11,7 @@ const gamesData = [
     slug: "freefire",
     image: "https://images.unsplash.com/photo-1552820728-8b83bb6b773f?w=400&h=300&fit=crop",
     category: "Battle Royale",
-    price: "Free",
+    price: "available",
     rating: 4.5,
     players: "500M+"
   },
@@ -21,7 +21,7 @@ const gamesData = [
     slug: "pubg",
     image: "https://images.unsplash.com/photo-1550745165-9bc0b252726f?w=400&h=300&fit=crop",
     category: "Battle Royale",
-    price: "Free",
+    price: "available",
     rating: 4.8,
     players: "1B+"
   },
@@ -31,7 +31,7 @@ const gamesData = [
     slug: "efootball",
     image: "https://images.unsplash.com/photo-1575361204480-aadea25e6e68?w=400&h=300&fit=crop",
     category: "Sports",
-    price: "Free",
+    price: "available",
     rating: 4.3,
     players: "300M+"
   },
@@ -41,7 +41,7 @@ const gamesData = [
     slug: "clashofclans",
     image: "https://images.unsplash.com/photo-1534423861386-85a16f5d13fd?w=400&h=300&fit=crop",
     category: "Strategy",
-    price: "Free",
+    price: "available",
     rating: 4.7,
     players: "500M+"
   },
@@ -51,7 +51,7 @@ const gamesData = [
     slug: "callofduty",
     image: "https://images.unsplash.com/photo-1542751371-adc38448a05e?w=400&h=300&fit=crop",
     category: "FPS",
-    price: "Free",
+    price: "available",
     rating: 4.6,
     players: "500M+"
   },
@@ -61,7 +61,7 @@ const gamesData = [
     slug: "valorant",
     image: "https://images.unsplash.com/photo-1614680376573-df3480f0c6ff?w=400&h=300&fit=crop",
     category: "FPS",
-    price: "Free",
+    price: "available",
     rating: 4.4,
     players: "200M+"
   },
@@ -71,7 +71,7 @@ const gamesData = [
     slug: "mobilelegends",
     image: "https://images.unsplash.com/photo-1542751110-97427bbecf20?w=400&h=300&fit=crop",
     category: "MOBA",
-    price: "Free",
+    price: "available",
     rating: 4.2,
     players: "1B+"
   },
@@ -81,7 +81,7 @@ const gamesData = [
     slug: "genshinimpact",
     image: "https://images.unsplash.com/photo-1635863138275-d9b33299680a?w=400&h=300&fit=crop",
     category: "RPG",
-    price: "Free",
+    price: "available",
     rating: 4.9,
     players: "400M+"
   },
@@ -91,7 +91,7 @@ const gamesData = [
     slug: "clashroyale",
     image: "https://images.unsplash.com/photo-1585504198191-3c1b143d0b8d?w=400&h=300&fit=crop",
     category: "Strategy",
-    price: "Free",
+    price: "available",
     rating: 4.5,
     players: "300M+"
   },
@@ -101,7 +101,7 @@ const gamesData = [
     slug: "fortnite",
     image: "https://images.unsplash.com/photo-1542751110-97427bbecf20?w=400&h=300&fit=crop",
     category: "Battle Royale",
-    price: "Free",
+    price: "available",
     rating: 4.7,
     players: "350M+"
   }
@@ -189,7 +189,7 @@ function GameShop() {
                 </div>
 
                 <div className="game-actions">
-                  <button className="play-now-btn">Play Now</button>
+                  <button className="play-now-btn">Shop Now</button>
                   <button className="details-btn">Details</button>
                 </div>
               </div>

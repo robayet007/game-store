@@ -1,9 +1,10 @@
 import React, { useState } from 'react';
 import { Eye, EyeOff, UserPlus } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
-import './Login.css';
-
-const Register = ({ onSignup }) => {
+import { createUserWithEmailAndPassword, signInWithPopup, GoogleAuthProvider } from 'firebase/auth';
+import { auth } from '../firebaseConfig';
+import "./Login.css"
+const Register = () => {
   const [formData, setFormData] = useState({
     username: '',
     email: '',
@@ -14,6 +15,8 @@ const Register = ({ onSignup }) => {
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [agreeTerms, setAgreeTerms] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState('');
   const navigate = useNavigate();
 
   const handleChange = (e) => {
@@ -21,29 +24,43 @@ const Register = ({ onSignup }) => {
       ...formData,
       [e.target.name]: e.target.value
     });
+    setError('');
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     
     if (formData.password !== formData.confirmPassword) {
-      alert("Passwords don't match!");
+      setError("Passwords don't match!");
       return;
     }
 
     if (!agreeTerms) {
-      alert("Please agree to the terms and conditions");
+      setError("Please agree to the terms and conditions");
       return;
     }
 
-    console.log('Signup attempt:', formData);
-    if (onSignup) {
-      onSignup(formData);
+    setLoading(true);
+    setError('');
+
+    try {
+      await createUserWithEmailAndPassword(auth, formData.email, formData.password);
+      navigate('/'); // Redirect to home after successful registration
+    } catch (error) {
+      setError(error.message);
+    } finally {
+      setLoading(false);
     }
   };
 
-  const handleGoogleSignup = () => {
-    console.log('Google signup clicked');
+  const handleGoogleSignup = async () => {
+    try {
+      const provider = new GoogleAuthProvider();
+      await signInWithPopup(auth, provider);
+      navigate('/'); // Redirect to home after successful registration
+    } catch (error) {
+      setError(error.message);
+    }
   };
 
   const handleSignIn = () => {
@@ -61,6 +78,8 @@ const Register = ({ onSignup }) => {
           <p className="auth-subtitle">Create your gaming account</p>
         </div>
 
+        {error && <div className="error-message">{error}</div>}
+
         <form onSubmit={handleSubmit} className="auth-form">
           <div className="form-group">
             <input
@@ -71,6 +90,7 @@ const Register = ({ onSignup }) => {
               placeholder="Choose your username"
               className="form-input"
               required
+              disabled={loading}
             />
           </div>
 
@@ -83,6 +103,7 @@ const Register = ({ onSignup }) => {
               placeholder="Enter your email"
               className="form-input"
               required
+              disabled={loading}
             />
           </div>
 
@@ -95,6 +116,7 @@ const Register = ({ onSignup }) => {
               placeholder="+8801XXXXXXXXX"
               className="form-input"
               required
+              disabled={loading}
             />
           </div>
 
@@ -108,11 +130,13 @@ const Register = ({ onSignup }) => {
                 placeholder="Create your password"
                 className="form-input"
                 required
+                disabled={loading}
               />
               <button
                 type="button"
                 className="password-toggle"
                 onClick={() => setShowPassword(!showPassword)}
+                disabled={loading}
               >
                 {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
               </button>
@@ -129,11 +153,13 @@ const Register = ({ onSignup }) => {
                 placeholder="Confirm your password"
                 className="form-input"
                 required
+                disabled={loading}
               />
               <button
                 type="button"
                 className="password-toggle"
                 onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                disabled={loading}
               >
                 {showConfirmPassword ? <EyeOff size={18} /> : <Eye size={18} />}
               </button>
@@ -147,21 +173,27 @@ const Register = ({ onSignup }) => {
                 checked={agreeTerms}
                 onChange={(e) => setAgreeTerms(e.target.checked)}
                 className="checkbox-input"
+                disabled={loading}
               />
               <span className="checkmark"></span>
               I agree to the <a href="/terms">Terms</a> & <a href="/privacy">Privacy</a>
             </label>
           </div>
 
-          <button type="submit" className="auth-btn register-btn">
+          <button type="submit" className="auth-btn register-btn" disabled={loading}>
             <UserPlus size={20} />
-            CREATE ACCOUNT
+            {loading ? 'CREATING ACCOUNT...' : 'CREATE ACCOUNT'}
           </button>
         </form>
 
         <div className="social-section">
           <div className="social-buttons">
-            <button type="button" className="social-btn google-btn" onClick={handleGoogleSignup}>
+            <button 
+              type="button" 
+              className="social-btn google-btn" 
+              onClick={handleGoogleSignup}
+              disabled={loading}
+            >
               <svg className="social-icon" viewBox="0 0 24 24">
                 <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/>
                 <path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/>

@@ -1,9 +1,7 @@
-"use client";
-
 import { useState, useEffect } from "react";
 import { Link, useLocation } from "react-router-dom";
-import { User } from "lucide-react";
 import "./NavMenu.css";
+import ProfileIcon from "./ProfileIcon";
 
 function NavMenu() {
   const location = useLocation();
@@ -15,7 +13,7 @@ function NavMenu() {
       setActiveItem("home");
     } else if (location.pathname === "/games") {
       setActiveItem("games");
-    } else if (location.pathname === "/profile") {
+    } else if (location.pathname.includes("/dashboard")) {
       setActiveItem("profile");
     } else {
       setActiveItem(""); // অন্য কোনো route হলে active remove হবে
@@ -70,16 +68,8 @@ function NavMenu() {
           <span className="navmenu-text">Games</span>
         </Link>
 
-        {/* Profile Link */}
-        <Link
-          to="/profile"
-          className={`navmenu-item ${activeItem === "profile" ? "active" : ""}`}
-        >
-          <div className="navmenu-icon">
-            <User size={24} />
-          </div>
-          <span className="navmenu-text">Profile</span>
-        </Link>
+        {/* Profile Icon */}
+        <ProfileIcon />
       </nav>
     </div>
   );

@@ -5,7 +5,8 @@
   padding: 1.5rem 1rem;
   border-top: 2px solid #00ffff;
   box-shadow: 0 -5px 30px rgba(0, 255, 255, 0.3);
-  margin-top: 2rem;
+  margin-top: auto; /* This pushes footer to bottom */
+  width: 100%;
 }
 
 .footer-content {
@@ -165,6 +166,9 @@
   background: rgba(255, 255, 255, 0.1);
   padding: 0.3rem;
   backdrop-filter: blur(10px);
+}
+
+.payment-logo:hover {
   transform: translateY(-3px) rotateY(8deg);
   box-shadow: 0 5px 15px rgba(0, 255, 255, 0.4);
   border-color: #00ffff;
@@ -177,8 +181,6 @@
   object-fit: contain;
   border-radius: 4px;
 }
-
-
 
 /* Footer Bottom */
 .footer-bottom {

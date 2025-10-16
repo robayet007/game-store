@@ -1,0 +1,340 @@
+/* Subscriptions.css */
+.subscriptions-container {
+  padding: 2rem 1rem;
+  max-width: 1400px;
+  margin: 0 auto;
+}
+
+.subscriptions-header {
+  text-align: center;
+  margin-bottom: 2rem;
+}
+
+.subscriptions-title {
+  font-size: 2.5rem;
+  font-weight: 800;
+  background: linear-gradient(45deg, #00ffff, #ff00ff, #00ff00);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  margin-bottom: 0.5rem;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  text-shadow: 0 0 30px rgba(0, 255, 255, 0.5);
+  animation: titleGlow 3s ease-in-out infinite alternate;
+}
+
+.subscriptions-subtitle {
+  color: #ccc;
+  font-size: 1.1rem;
+  text-shadow: 0 0 10px rgba(0, 255, 255, 0.3);
+}
+
+@keyframes titleGlow {
+  0% {
+    text-shadow: 0 0 30px rgba(0, 255, 255, 0.5),
+                 0 0 40px rgba(255, 0, 255, 0.3);
+  }
+  100% {
+    text-shadow: 0 0 40px rgba(0, 255, 255, 0.8),
+                 0 0 50px rgba(255, 0, 255, 0.5),
+                 0 0 60px rgba(0, 255, 0, 0.3);
+  }
+}
+
+/* Horizontal Grid with Rows */
+.subscriptions-grid-horizontal {
+  display: grid;
+  grid-template-rows: repeat(2, 1fr);
+  grid-auto-flow: column;
+  gap: 1.5rem;
+  overflow-x: auto;
+  overflow-y: hidden;
+  scroll-behavior: smooth;
+  padding: 1.5rem 0.5rem;
+  max-height: 400px;
+  min-height: 350px;
+}
+
+/* Custom Gaming Scrollbar */
+.subscriptions-grid-horizontal::-webkit-scrollbar {
+  height: 12px;
+}
+
+.subscriptions-grid-horizontal::-webkit-scrollbar-track {
+  background: rgba(0, 0, 0, 0.3);
+  border-radius: 10px;
+  margin: 0 20px;
+  border: 1px solid rgba(0, 255, 255, 0.2);
+}
+
+.subscriptions-grid-horizontal::-webkit-scrollbar-thumb {
+  background: linear-gradient(90deg, 
+    rgba(0, 255, 255, 0.8), 
+    rgba(255, 0, 255, 0.8), 
+    rgba(0, 255, 0, 0.8));
+  border-radius: 10px;
+  border: 2px solid rgba(0, 0, 0, 0.3);
+  box-shadow: 0 0 15px rgba(0, 255, 255, 0.5);
+  transition: all 0.3s ease;
+}
+
+.subscriptions-grid-horizontal::-webkit-scrollbar-thumb:hover {
+  background: linear-gradient(90deg, 
+    rgba(0, 255, 255, 1), 
+    rgba(255, 0, 255, 1), 
+    rgba(0, 255, 0, 1));
+  box-shadow: 0 0 20px rgba(0, 255, 255, 0.8),
+              0 0 30px rgba(255, 0, 255, 0.6);
+  transform: scale(1.1);
+}
+
+/* Horizontal Card Design */
+.subscription-card-horizontal {
+  background: linear-gradient(135deg, 
+    rgba(255, 255, 255, 0.1), 
+    rgba(255, 255, 255, 0.05));
+  border-radius: 15px;
+  padding: 1.5rem;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  backdrop-filter: blur(15px);
+  cursor: pointer;
+  transition: all 0.4s ease;
+  position: relative;
+  overflow: hidden;
+  min-width: 300px;
+  height: 150px;
+  display: flex;
+  align-items: center;
+}
+
+.subscription-card-horizontal::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: var(--card-gradient);
+  opacity: 0.1;
+  transition: opacity 0.3s ease;
+}
+
+.subscription-card-horizontal:hover::before {
+  opacity: 0.3;
+}
+
+.card-glow {
+  position: absolute;
+  top: -2px;
+  left: -2px;
+  right: -2px;
+  bottom: -2px;
+  background: linear-gradient(45deg, 
+    rgba(0, 255, 255, 0.4), 
+    rgba(255, 0, 255, 0.4), 
+    rgba(0, 255, 0, 0.4));
+  border-radius: 16px;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+  z-index: -1;
+}
+
+.subscription-card-horizontal:hover .card-glow {
+  opacity: 1;
+  animation: cardPulse 2s ease-in-out infinite;
+}
+
+@keyframes cardPulse {
+  0%, 100% {
+    opacity: 0.6;
+  }
+  50% {
+    opacity: 1;
+  }
+}
+
+.card-content-horizontal {
+  display: flex;
+  align-items: center;
+  gap: 1.2rem;
+  width: 100%;
+  position: relative;
+  z-index: 2;
+}
+
+.card-logo-horizontal {
+  flex-shrink: 0;
+}
+
+.card-logo-horizontal img {
+  height: 60px;
+  width: 60px;
+  object-fit: contain;
+  border-radius: 12px;
+  padding: 8px;
+  background: rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  transition: all 0.3s ease;
+}
+
+.subscription-card-horizontal:hover .card-logo-horizontal img {
+  transform: scale(1.1) rotate(5deg);
+  border-color: #00ffff;
+  box-shadow: 0 0 20px rgba(0, 255, 255, 0.5);
+}
+
+.card-info-horizontal {
+  flex: 1;
+}
+
+.card-title-horizontal {
+  font-size: 1.4rem;
+  font-weight: 700;
+  color: #fff;
+  margin-bottom: 0.3rem;
+  text-shadow: 0 0 10px rgba(0, 255, 255, 0.3);
+}
+
+.card-description-horizontal {
+  color: #ccc;
+  font-size: 0.85rem;
+  margin-bottom: 0.8rem;
+  line-height: 1.3;
+}
+
+.card-price-horizontal {
+  background: linear-gradient(45deg, #3FC56D, #2ea856);
+  color: white;
+  padding: 0.4rem 1rem;
+  border-radius: 20px;
+  font-weight: 600;
+  font-size: 0.85rem;
+  width: fit-content;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  box-shadow: 0 0 15px rgba(63, 197, 109, 0.3);
+}
+
+.card-badge {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  background: linear-gradient(45deg, #ff00ff, #00ffff);
+  color: white;
+  padding: 0.3rem 0.8rem;
+  border-radius: 12px;
+  font-size: 0.7rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  animation: badgeGlow 2s ease-in-out infinite alternate;
+}
+
+@keyframes badgeGlow {
+  0% {
+    box-shadow: 0 0 10px rgba(255, 0, 255, 0.5);
+  }
+  100% {
+    box-shadow: 0 0 20px rgba(0, 255, 255, 0.8);
+  }
+}
+
+.card-overlay-horizontal {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(45deg, 
+    rgba(0, 255, 255, 0.9), 
+    rgba(255, 0, 255, 0.9));
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  transition: all 0.3s ease;
+  border-radius: 15px;
+}
+
+.subscription-card-horizontal:hover .card-overlay-horizontal {
+  opacity: 1;
+}
+
+.card-overlay-horizontal span {
+  color: white;
+  font-weight: 700;
+  font-size: 1rem;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  text-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .subscriptions-container {
+    padding: 1.5rem 0.8rem;
+  }
+  
+  .subscriptions-title {
+    font-size: 2rem;
+  }
+  
+  .subscriptions-grid-horizontal {
+    grid-template-rows: repeat(2, 1fr);
+    gap: 1rem;
+    max-height: 350px;
+    min-height: 300px;
+  }
+  
+  .subscription-card-horizontal {
+    min-width: 280px;
+    height: 140px;
+    padding: 1.2rem;
+  }
+  
+  .card-logo-horizontal img {
+    height: 50px;
+    width: 50px;
+  }
+  
+  .card-title-horizontal {
+    font-size: 1.2rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .subscriptions-container {
+    padding: 1rem 0.5rem;
+  }
+  
+  .subscriptions-title {
+    font-size: 1.7rem;
+  }
+  
+  .subscriptions-grid-horizontal {
+    grid-template-rows: repeat(2, 1fr);
+    gap: 0.8rem;
+    max-height: 320px;
+    min-height: 280px;
+  }
+  
+  .subscription-card-horizontal {
+    min-width: 260px;
+    height: 130px;
+    padding: 1rem;
+  }
+  
+  .card-logo-horizontal img {
+    height: 45px;
+    width: 45px;
+  }
+  
+  .card-title-horizontal {
+    font-size: 1.1rem;
+  }
+  
+  .card-description-horizontal {
+    font-size: 0.8rem;
+  }
+}

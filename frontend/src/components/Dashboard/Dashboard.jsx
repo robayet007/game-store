@@ -38,6 +38,23 @@ const Dashboard = () => {
   const [passwordError, setPasswordError] = useState('');
   const [passwordSuccess, setPasswordSuccess] = useState('');
 
+  // Auth state listener
+  useEffect(() => {
+    const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
+      console.log('Auth State Changed:', currentUser); // Debug log
+      setUser(currentUser);
+      setLoading(false);
+      
+      // যদি user null হয় (logout), তাহলে home e navigate করবে
+      if (!currentUser) {
+        console.log('No user found, navigating to home'); // Debug log
+        navigate('/');
+      }
+    });
+
+    return () => unsubscribe();
+  }, [navigate]);
+
   // Mock order data
   const orders = [
     { 
@@ -49,43 +66,8 @@ const Dashboard = () => {
       gameIcon: '🎮',
       orderId: 'MG001'
     },
-    { 
-      id: 2, 
-      game: 'Free Fire Diamonds - 1000', 
-      price: '৳ 899', 
-      status: 'pending', 
-      date: '2024-01-16',
-      gameIcon: '💎',
-      orderId: 'MG002'
-    },
-    { 
-      id: 3, 
-      game: 'Call of Duty CP - 2400', 
-      price: '৳ 1,999', 
-      status: 'cancelled', 
-      date: '2024-01-14',
-      gameIcon: '🔫',
-      orderId: 'MG003'
-    },
-    { 
-      id: 4, 
-      game: 'Valorant Points - 1000', 
-      price: '৳ 799', 
-      status: 'delivered', 
-      date: '2024-01-13',
-      gameIcon: '⚡',
-      orderId: 'MG004'
-    }
+    // ... আপনার existing orders data
   ];
-
-  useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
-      setUser(currentUser);
-      setLoading(false);
-    });
-
-    return () => unsubscribe();
-  }, []);
 
   const getStatusIcon = (status) => {
     switch (status) {
@@ -124,14 +106,11 @@ const Dashboard = () => {
     }
 
     try {
-      // Re-authenticate user
       const credential = EmailAuthProvider.credential(
         user.email, 
         passwordData.currentPassword
       );
       await reauthenticateWithCredential(user, credential);
-      
-      // Update password
       await updatePassword(user, passwordData.newPassword);
       
       setPasswordSuccess('Password updated successfully!');
@@ -156,8 +135,10 @@ const Dashboard = () => {
 
   const handleLogout = async () => {
     try {
+      console.log('Logout button clicked'); // Debug log
       await signOut(auth);
-      navigate('/'); // ✅ Home route e redirect
+      console.log('SignOut completed'); // Debug log
+      // Navigation will be handled by the useEffect auth listener
     } catch (error) {
       console.error('Logout error:', error);
     }
@@ -177,11 +158,21 @@ const Dashboard = () => {
     });
   };
 
+  // যদি user না থাকে (logout হয়ে যায়), তাহলে loading show করবে
+  if (!user && !loading) {
+    return (
+      <div className="dashboard-loading">
+        Logging out... Redirecting to home...
+      </div>
+    );
+  }
+
   const renderContent = () => {
     if (loading) {
       return <div className="loading">Loading...</div>;
     }
 
+    // ... আপনার existing renderContent code
     switch (activeTab) {
       case 'orders':
         return (

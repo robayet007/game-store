@@ -107,7 +107,8 @@ function AppContent() {
         {/* Fallback route */}
         <Route path="*" element={<Navigate to="/" />} />
       </Routes>
-      {!isAuthPage && <NavMenu user={user} />}
+      {/* {!isAuthPage && <NavMenu user={user} />} */}
+      <NavMenu user={user}/>
       {!isAuthPage && !isDashboard && <Footer />}
     </div>
   );

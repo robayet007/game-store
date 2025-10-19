@@ -13,6 +13,9 @@ import Checkout from "./components/Checkout/Checkout";
 import Register from "./Auth/Register";
 import Login from "./Auth/Login";
 import Dashboard from "./components/Dashboard/Dashboard";
+import ForgotPassword from "./Auth/ForgotPassword";
+import AdminDashboard from "./components/Admin/AdminDashboard";
+import { isAdminUser } from "./utils/admin";
 
 // Protected Route Component
 const ProtectedRoute = ({ children }) => {
@@ -56,26 +59,57 @@ const PublicRoute = ({ children }) => {
   return !user ? children : <Navigate to="/" />;
 };
 
-function AppContent() {
-  const location = useLocation();
+// ✅ Admin Route Component
+const AdminRoute = ({ children }) => {
   const [user, setUser] = useState(null);
-  
-  const isDashboard = location.pathname === "/dashboard";
-  const isCheckoutPage = location.pathname === "/checkout";
-  const isAuthPage = location.pathname === "/profile/login" || location.pathname === "/profile/register";
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, (user) => {
-      setUser(user);
+    const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
+      setUser(currentUser);
+      setLoading(false);
     });
 
     return () => unsubscribe();
   }, []);
 
+  if (loading) {
+    return <div className="loading">Loading...</div>;
+  }
+
+  const isAdmin = user && isAdminUser(user);
+  return isAdmin ? children : <Navigate to="/" />;
+};
+
+function AppContent() {
+  const location = useLocation();
+  const [user, setUser] = useState(null);
+  
+  const isDashboard = location.pathname === "/dashboard" || location.pathname === "/profile/dashboard";
+  const isAdminDashboard = location.pathname === "/admin/dashboard";
+  const isCheckoutPage = location.pathname === "/checkout";
+  const isAuthPage = location.pathname === "/profile/login" || 
+                    location.pathname === "/profile/register" || 
+                    location.pathname === "/forgot-password";
+
+  useEffect(() => {
+    const unsubscribe = onAuthStateChanged(auth, (user) => {
+      console.log('🔐 Auth State Changed - User:', user?.email);
+      console.log('📍 Current Path:', location.pathname);
+      setUser(user);
+      
+      // ✅ NO AUTO-REDIRECT - শুধু state update
+      // Login.jsx নিজেই handle করবে redirect
+    });
+
+    return () => unsubscribe();
+  }, [location.pathname]); // ✅ location.pathname dependency
+
   return (
     <div className="app">
-      {!isAuthPage && <Navbar user={user} />}
-      {!isCheckoutPage && !isDashboard && !isAuthPage && <Carousel />}
+      {!isAuthPage && !isAdminDashboard && <Navbar user={user} />}
+      {!isCheckoutPage && !isDashboard && !isAuthPage && !isAdminDashboard && <Carousel />}
+      
       <Routes>
         <Route path="/" element={<Home />} />
         <Route path="/games" element={<GameShop />} />
@@ -86,30 +120,44 @@ function AppContent() {
             <Checkout />
           </ProtectedRoute>
         } />
+        
         <Route path="/profile/dashboard" element={
           <ProtectedRoute>
             <Dashboard />
           </ProtectedRoute>
         } />
         
-        {/* Auth Routes - Only accessible when not logged in */}
+        {/* ✅ Admin Routes */}
+        <Route path="/admin/dashboard" element={
+          <AdminRoute>
+            <AdminDashboard />
+          </AdminRoute>
+        } />
+        
+        {/* Auth Routes */}
         <Route path="/profile/login" element={
           <PublicRoute>
             <Login />
           </PublicRoute>
         } />
+        
         <Route path="/profile/register" element={
           <PublicRoute>
             <Register />
           </PublicRoute>
         } />
 
-        {/* Fallback route */}
+        <Route path="/forgot-password" element={
+          <PublicRoute>
+            <ForgotPassword />
+          </PublicRoute>
+        } />
+
         <Route path="*" element={<Navigate to="/" />} />
       </Routes>
-      {/* {!isAuthPage && <NavMenu user={user} />} */}
+      
       <NavMenu user={user}/>
-      {!isAuthPage && !isDashboard && <Footer />}
+      {!isAuthPage && !isDashboard && !isAdminDashboard && <Footer />}
     </div>
   );
 }

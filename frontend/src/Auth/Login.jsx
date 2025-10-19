@@ -3,7 +3,9 @@ import { Eye, EyeOff, LogIn } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { signInWithEmailAndPassword, signInWithPopup, GoogleAuthProvider } from 'firebase/auth';
 import { auth } from '../firebaseConfig';
+import { isAdminUser } from '../utils/admin';
 import "./Login.css"
+
 const Login = () => {
   const [formData, setFormData] = useState({
     email: '',
@@ -29,9 +31,25 @@ const Login = () => {
     setError('');
 
     try {
-      await signInWithEmailAndPassword(auth, formData.email, formData.password);
-      navigate('/'); // Redirect to home after successful login
+      const userCredential = await signInWithEmailAndPassword(auth, formData.email, formData.password);
+      const user = userCredential.user;
+      
+      console.log('🔐 Login Successful - User Email:', user.email);
+      
+      // ✅ Admin check
+      const isAdmin = isAdminUser(user);
+      console.log('🔍 Admin Check Result:', isAdmin);
+      
+      if (isAdmin) {
+        console.log('🚀 ADMIN DETECTED - Redirecting to Admin Dashboard');
+        navigate('/admin/dashboard'); // ✅ Admin dashboard
+      } else {
+        console.log('👤 Regular User - Redirecting to Home');
+        navigate('/'); // ✅ Regular user home
+      }
+      
     } catch (error) {
+      console.error('❌ Login Error:', error);
       setError(error.message);
     } finally {
       setLoading(false);
@@ -41,15 +59,34 @@ const Login = () => {
   const handleGoogleLogin = async () => {
     try {
       const provider = new GoogleAuthProvider();
-      await signInWithPopup(auth, provider);
-      navigate('/'); // Redirect to home after successful login
+      const userCredential = await signInWithPopup(auth, provider);
+      const user = userCredential.user;
+      
+      console.log('🔐 Google Login Successful:', user.email);
+      
+      // ✅ Admin check for Google login
+      const isAdmin = isAdminUser(user);
+      console.log('🔍 Google Admin Check:', isAdmin);
+      
+      if (isAdmin) {
+        console.log('🚀 Redirecting to Admin Dashboard...');
+        navigate('/admin/dashboard');
+      } else {
+        console.log('🏠 Redirecting to Home...');
+        navigate('/');
+      }
     } catch (error) {
+      console.error('❌ Google Login Error:', error);
       setError(error.message);
     }
   };
 
   const handleCreateAccount = () => {
     navigate('/profile/register');
+  };
+
+  const handleForgotPassword = () => {
+    navigate('/forgot-password');
   };
 
   return (
@@ -114,9 +151,9 @@ const Login = () => {
               <span className="checkmark"></span>
               Remember me
             </label>
-            <a href="/forgot-password" className="forgot-link">
+            <span onClick={handleForgotPassword} className="forgot-link">
               Forgot Password?
-            </a>
+            </span>
           </div>
 
           <button type="submit" className="auth-btn login-btn" disabled={loading}>

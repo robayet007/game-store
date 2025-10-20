@@ -4,7 +4,7 @@ import './CategoryProduct.css';
 const CategoryProduct = ({ category, products, onEditProduct, onDeleteProduct }) => {
   const categoryNames = {
     'subscription': '👑 Subscription Products',
-    'special-offers': '⭐ Special Offers',
+    'special-offers': '⭐ Special Offers', 
     'game-topup': '🎮 Game Shop Products'
   };
 
@@ -18,6 +18,24 @@ const CategoryProduct = ({ category, products, onEditProduct, onDeleteProduct })
     return cat.split('-').map(word =>
       word.charAt(0).toUpperCase() + word.slice(1)
     ).join(' ');
+  };
+
+  // ✅ FIX: Correct image URL function
+  const getImageUrl = (imagePath) => {
+    if (!imagePath) return '/default-product.jpg';
+    
+    // যদি imagePath already full URL হয়
+    if (imagePath.startsWith('http')) {
+      return imagePath;
+    }
+    
+    // যদি imagePath relative path হয় (/uploads/filename.jpg)
+    if (imagePath.startsWith('/uploads/')) {
+      return `http://localhost:5000${imagePath}`;
+    }
+    
+    // অন্য কোন case-এ default image
+    return '/default-product.jpg';
   };
 
   return (
@@ -35,25 +53,30 @@ const CategoryProduct = ({ category, products, onEditProduct, onDeleteProduct })
       ) : (
         <div className="products-grid">
           {products.map(product => (
-            <div key={product.id} className="product-card">
-
-              {/* Product Image */}
+            <div 
+              key={product._id || product.id}
+              className="product-card"
+            >
+              {/* Product Image - FIXED */}
               <div className="product-image">
                 <img
-                  src={product.image || '/default-product.jpg'}
-                  alt={product.name}
-                  onError={(e) => (e.target.src = '/default-product.jpg')}
+                  src={getImageUrl(product.image || product.imageUrl)}
+                  alt={product.title || product.name}
+                  onError={(e) => {
+                    console.log('❌ Image failed to load:', product.image || product.imageUrl);
+                    e.target.src = '/default-product.jpg';
+                  }}
                 />
                 <div className="product-badge">
                   {formatCategory(product.category)}
                 </div>
               </div>
-
+              
               {/* Product Info */}
               <div className="product-info">
                 <div>
-                  <h3 className="product-name" title={product.name}>
-                    {product.name}
+                  <h3 className="product-name" title={product.title || product.name}>
+                    {product.title || product.name}
                   </h3>
                   <p className="product-description" title={product.description}>
                     {truncateDescription(product.description)}
@@ -62,7 +85,7 @@ const CategoryProduct = ({ category, products, onEditProduct, onDeleteProduct })
 
                 <div className="product-details">
                   <div className="product-price">৳{product.price}</div>
-                  <div className="product-stock">Stock: {product.stock}</div>
+                  {/* <div className="product-stock">Stock: {product.stock || 100}</div> */}
                 </div>
               </div>
 
@@ -76,8 +99,8 @@ const CategoryProduct = ({ category, products, onEditProduct, onDeleteProduct })
                 </button>
                 <button
                   onClick={() => {
-                    if (window.confirm(`Delete "${product.name}"?`)) {
-                      onDeleteProduct(product.id);
+                    if (window.confirm(`Delete "${product.title || product.name}"?`)) {
+                      onDeleteProduct(product._id || product.id);
                     }
                   }}
                   className="delete-btn"

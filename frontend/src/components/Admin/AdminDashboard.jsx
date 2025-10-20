@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { signOut } from 'firebase/auth';
 import { auth } from '../../firebaseConfig';
@@ -6,51 +6,24 @@ import { isAdminUser } from '../../utils/admin';
 import Sidebar from './Sidebar/Sidebar';
 import AddProduct from './AddProduct/AddProduct';
 import CategoryView from './CatagoryProduct/CategoryProduct';
+import { useProducts } from '../../hooks/useProducts';
 import './AdminDashboard.css';
 
 const AdminDashboard = () => {
   const [activeSection, setActiveSection] = useState('add-product');
   const [selectedCategory, setSelectedCategory] = useState('subscription');
-  const [products, setProducts] = useState([
-    {
-      id: 1,
-      name: 'Premium Monthly',
-      category: 'subscription',
-      price: 299,
-      image: '/images/premium.jpg',
-      description: 'Monthly premium subscription with exclusive benefits',
-      stock: 100
-    },
-    {
-      id: 2,
-      name: 'VIP Annual Pass',
-      category: 'subscription', 
-      price: 2499,
-      image: '/images/vip.jpg',
-      description: 'Annual VIP pass with all premium features',
-      stock: 50
-    },
-    {
-      id: 3,
-      name: 'Special Weekend Bundle',
-      category: 'special-offers',
-      price: 199,
-      image: '/images/weekend.jpg',
-      description: 'Limited time weekend special offer',
-      stock: 25
-    },
-    {
-      id: 4,
-      name: 'PUBG UC 600',
-      category: 'game-topup',
-      price: 499,
-      image: '/images/pubg.jpg',
-      description: '600 UC for PUBG Mobile',
-      stock: 100
-    }
-  ]);
-
   const [editingProduct, setEditingProduct] = useState(null);
+
+  // Use the custom hook for products
+  const { 
+    products, 
+    loading, 
+    error, 
+    addProduct, 
+    updateProduct, 
+    deleteProduct,
+    refreshProducts 
+  } = useProducts(selectedCategory);
 
   const navigate = useNavigate();
   const user = auth.currentUser;
@@ -69,28 +42,39 @@ const AdminDashboard = () => {
     }
   };
 
-  // Add Product Function
-  const addNewProduct = (productData) => {
-    const newProduct = {
-      id: Date.now(),
-      ...productData,
-      stock: 100
-    };
-    setProducts([...products, newProduct]);
+  // Add Product Function - Now connects to backend
+  const addNewProduct = async (productData) => {
+    const result = await addProduct(productData);
+    
+    if (result.success) {
+      alert(result.message);
+    } else {
+      alert('Error: ' + result.error);
+    }
   };
 
-  // Edit Product Function
-  const editProduct = (productId, updatedData) => {
-    setProducts(products.map(product => 
-      product.id === productId ? { ...product, ...updatedData } : product
-    ));
-    setEditingProduct(null);
+  // Edit Product Function - Now connects to backend
+  const editProduct = async (productId, updatedData) => {
+    const result = await updateProduct(productId, updatedData);
+    
+    if (result.success) {
+      alert(result.message);
+      setEditingProduct(null);
+    } else {
+      alert('Error: ' + result.error);
+    }
   };
 
-  // Delete Product Function
-  const deleteProduct = (productId) => {
+  // Delete Product Function - Now connects to backend
+  const deleteProductHandler = async (productId) => {
     if (window.confirm('Are you sure you want to delete this product?')) {
-      setProducts(products.filter(product => product.id !== productId));
+      const result = await deleteProduct(productId);
+      
+      if (result.success) {
+        alert(result.message);
+      } else {
+        alert('Error: ' + result.error);
+      }
     }
   };
 
@@ -116,11 +100,63 @@ const AdminDashboard = () => {
           category={selectedCategory}
           products={products.filter(p => p.category === selectedCategory)}
           onEditProduct={startEditing}
-          onDeleteProduct={deleteProduct}
+          onDeleteProduct={deleteProductHandler}
         />
       );
     }
   };
+
+  // Show loading or error states
+  if (loading && activeSection !== 'add-product') {
+    return (
+      <div className="admin-dashboard">
+        <Sidebar 
+          activeSection={activeSection}
+          selectedCategory={selectedCategory}
+          onSectionChange={setActiveSection}
+          onCategoryChange={setSelectedCategory}
+        />
+        <div className="admin-main">
+          <header className="admin-header">
+            <div className="header-content">
+              <h1>🎮 MetaGameShop Admin</h1>
+            </div>
+          </header>
+          <main className="content-area">
+            <div className="loading-state">🔄 Loading products...</div>
+          </main>
+        </div>
+      </div>
+    );
+  }
+
+  if (error && activeSection !== 'add-product') {
+    return (
+      <div className="admin-dashboard">
+        <Sidebar 
+          activeSection={activeSection}
+          selectedCategory={selectedCategory}
+          onSectionChange={setActiveSection}
+          onCategoryChange={setSelectedCategory}
+        />
+        <div className="admin-main">
+          <header className="admin-header">
+            <div className="header-content">
+              <h1>🎮 MetaGameShop Admin</h1>
+            </div>
+          </header>
+          <main className="content-area">
+            <div className="error-state">
+              ❌ Error: {error}
+              <button onClick={refreshProducts} className="retry-btn">
+                🔄 Retry
+              </button>
+            </div>
+          </main>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="admin-dashboard">

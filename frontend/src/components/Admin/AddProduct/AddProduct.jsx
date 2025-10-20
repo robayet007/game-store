@@ -10,6 +10,8 @@ const AddProduct = ({ onAddProduct, onEditProduct, editingProduct, onCancelEdit 
     description: '',
     image: null
   });
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [selectedFile, setSelectedFile] = useState(null);
 
   const categories = [
     { value: 'subscription', label: '👑 Subscription' },
@@ -22,10 +24,10 @@ const AddProduct = ({ onAddProduct, onEditProduct, editingProduct, onCancelEdit 
     if (editingProduct) {
       setFormData({
         category: editingProduct.category,
-        name: editingProduct.name,
-        price: editingProduct.price.toString(),
-        description: editingProduct.description,
-        image: editingProduct.image
+        name: editingProduct.title || editingProduct.name,
+        price: editingProduct.price?.toString() || '',
+        description: editingProduct.description || '',
+        image: editingProduct.image || editingProduct.imageUrl
       });
       setShowModal(true);
     }
@@ -42,6 +44,21 @@ const AddProduct = ({ onAddProduct, onEditProduct, editingProduct, onCancelEdit 
   const handleImageChange = (e) => {
     const file = e.target.files[0];
     if (file) {
+      // Check file size (max 5MB)
+      if (file.size > 5 * 1024 * 1024) {
+        alert('Image size should be less than 5MB');
+        return;
+      }
+
+      // Check file type
+      if (!file.type.startsWith('image/')) {
+        alert('Please select an image file');
+        return;
+      }
+
+      setSelectedFile(file);
+
+      // Create preview
       const reader = new FileReader();
       reader.onload = (e) => {
         setFormData(prev => ({
@@ -53,32 +70,60 @@ const AddProduct = ({ onAddProduct, onEditProduct, editingProduct, onCancelEdit 
     }
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     
     if (!formData.name || !formData.price || !formData.description) {
-      alert('Please fill all fields');
+      alert('Please fill all required fields');
       return;
     }
 
-    const productData = {
-      name: formData.name,
-      category: formData.category,
-      price: parseInt(formData.price),
-      description: formData.description,
-      image: formData.image || '/default-product.jpg'
-    };
-
-    if (editingProduct) {
-      // Edit existing product
-      onEditProduct(editingProduct.id, productData);
-    } else {
-      // Add new product
-      onAddProduct(productData);
+    if (isNaN(formData.price) || Number(formData.price) <= 0) {
+      alert('Please enter a valid price');
+      return;
     }
 
-    resetForm();
-    setShowModal(false);
+    setIsSubmitting(true);
+
+    try {
+      // Create FormData object for file upload
+      const submitData = new FormData();
+      submitData.append('title', formData.name);
+      submitData.append('category', formData.category);
+      submitData.append('price', formData.price);
+      submitData.append('description', formData.description);
+      
+      // Append image file if selected
+      if (selectedFile) {
+        submitData.append('image', selectedFile);
+      }
+
+      console.log('📤 Submitting product data...');
+      console.log('Form data:', {
+        title: formData.name,
+        category: formData.category,
+        price: formData.price,
+        description: formData.description,
+        hasImage: !!selectedFile
+      });
+
+      if (editingProduct) {
+        // Edit existing product
+        const productId = editingProduct._id || editingProduct.id;
+        await onEditProduct(productId, submitData);
+      } else {
+        // Add new product
+        await onAddProduct(submitData);
+      }
+
+      resetForm();
+      setShowModal(false);
+    } catch (error) {
+      console.error('Error submitting product:', error);
+      alert('Error submitting product. Please try again.');
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   const resetForm = () => {
@@ -89,12 +134,28 @@ const AddProduct = ({ onAddProduct, onEditProduct, editingProduct, onCancelEdit 
       description: '',
       image: null
     });
-    onCancelEdit();
+    setSelectedFile(null);
+    // Reset file input
+    const fileInput = document.querySelector('.file-input');
+    if (fileInput) fileInput.value = '';
+    
+    onCancelEdit && onCancelEdit();
   };
 
   const handleCloseModal = () => {
     setShowModal(false);
     resetForm();
+  };
+
+  const removeImage = () => {
+    setFormData(prev => ({
+      ...prev,
+      image: null
+    }));
+    setSelectedFile(null);
+    // Reset file input
+    const fileInput = document.querySelector('.file-input');
+    if (fileInput) fileInput.value = '';
   };
 
   return (
@@ -107,10 +168,11 @@ const AddProduct = ({ onAddProduct, onEditProduct, editingProduct, onCancelEdit 
       <div className="add-product-content">
         <div className="action-card">
           <h3>{editingProduct ? 'Editing Product' : 'Ready to add a new product?'}</h3>
-          <p>{editingProduct ? 'You are currently editing a product' : 'Click the button below to open the product creation form'}</p>
+          <p>{editingProduct ? `You are editing: ${editingProduct.title || editingProduct.name}` : 'Click the button below to open the product creation form'}</p>
           <button 
             onClick={() => setShowModal(true)}
             className="open-modal-btn"
+            disabled={isSubmitting}
           >
             {editingProduct ? '🔄 Update Product' : '🎮 Create New Product'}
           </button>
@@ -126,6 +188,7 @@ const AddProduct = ({ onAddProduct, onEditProduct, editingProduct, onCancelEdit 
               <button 
                 onClick={handleCloseModal}
                 className="close-btn"
+                disabled={isSubmitting}
               >
                 ✕
               </button>
@@ -134,12 +197,14 @@ const AddProduct = ({ onAddProduct, onEditProduct, editingProduct, onCancelEdit 
             <form onSubmit={handleSubmit} className="product-form">
               {/* Category Selection */}
               <div className="form-group">
-                <label>Category</label>
+                <label>Category *</label>
                 <select
                   name="category"
                   value={formData.category}
                   onChange={handleInputChange}
                   className="form-select"
+                  disabled={isSubmitting}
+                  required
                 >
                   {categories.map(cat => (
                     <option key={cat.value} value={cat.value}>
@@ -151,7 +216,7 @@ const AddProduct = ({ onAddProduct, onEditProduct, editingProduct, onCancelEdit 
 
               {/* Product Name */}
               <div className="form-group">
-                <label>Product Title</label>
+                <label>Product Title *</label>
                 <input
                   type="text"
                   name="name"
@@ -159,13 +224,14 @@ const AddProduct = ({ onAddProduct, onEditProduct, editingProduct, onCancelEdit 
                   onChange={handleInputChange}
                   placeholder="Enter product name"
                   className="form-input"
+                  disabled={isSubmitting}
                   required
                 />
               </div>
 
               {/* Price */}
               <div className="form-group">
-                <label>Price (BDT)</label>
+                <label>Price (BDT) *</label>
                 <input
                   type="number"
                   name="price"
@@ -173,20 +239,24 @@ const AddProduct = ({ onAddProduct, onEditProduct, editingProduct, onCancelEdit 
                   onChange={handleInputChange}
                   placeholder="Enter price"
                   className="form-input"
+                  min="0"
+                  step="1"
+                  disabled={isSubmitting}
                   required
                 />
               </div>
 
               {/* Description */}
               <div className="form-group">
-                <label>Description</label>
+                <label>Description *</label>
                 <textarea
                   name="description"
                   value={formData.description}
                   onChange={handleInputChange}
-                  placeholder="Enter product description"
+                  placeholder="Enter product description..."
                   className="form-textarea"
                   rows="4"
+                  disabled={isSubmitting}
                   required
                 />
               </div>
@@ -194,31 +264,61 @@ const AddProduct = ({ onAddProduct, onEditProduct, editingProduct, onCancelEdit 
               {/* Image Upload */}
               <div className="form-group">
                 <label>Product Image</label>
-                <input
-                  type="file"
-                  accept="image/*"
-                  onChange={handleImageChange}
-                  className="file-input"
-                />
-                {formData.image && (
-                  <div className="image-preview">
-                    <img src={formData.image} alt="Preview" />
+                {!formData.image ? (
+                  <div className="image-upload-area">
+                    <input
+                      type="file"
+                      accept="image/*"
+                      onChange={handleImageChange}
+                      className="file-input"
+                      disabled={isSubmitting}
+                    />
+                    <div className="upload-placeholder">
+                      <span className="upload-icon">📁</span>
+                      <p>Click to upload product image</p>
+                      <small>PNG, JPG, WEBP (Max 5MB)</small>
+                    </div>
+                  </div>
+                ) : (
+                  <div className="image-preview-container">
+                    <div className="image-preview">
+                      <img src={formData.image} alt="Preview" />
+                      <button 
+                        type="button" 
+                        onClick={removeImage}
+                        className="remove-image-btn"
+                        disabled={isSubmitting}
+                      >
+                        ✕
+                      </button>
+                    </div>
+                    <p className="image-preview-text">Image preview - {selectedFile?.name}</p>
                   </div>
                 )}
               </div>
 
               {/* Form Actions */}
               <div className="form-actions">
-                <button type="submit" className="submit-btn">
-                  {editingProduct ? '✅ Update Product' : '✅ Add Product'}
+                <button 
+                  type="submit" 
+                  className="submit-btn"
+                  disabled={isSubmitting}
+                >
+                  {isSubmitting ? '⏳ Processing...' : (editingProduct ? '✅ Update Product' : '✅ Add Product')}
                 </button>
                 <button 
                   type="button" 
                   onClick={handleCloseModal}
                   className="cancel-btn"
+                  disabled={isSubmitting}
                 >
                   ❌ Cancel
                 </button>
+              </div>
+
+              {/* Required fields note */}
+              <div className="form-note">
+                <small>* Required fields</small>
               </div>
             </form>
           </div>

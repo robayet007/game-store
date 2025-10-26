@@ -16,7 +16,7 @@ import Login from "./Auth/Login";
 import Dashboard from "./components/Dashboard/Dashboard";
 import ForgotPassword from "./Auth/ForgotPassword";
 import AdminDashboard from "./components/Admin/AdminDashboard";
-import { isAdminUser } from "./Utils/admin";
+import { isAdminUser } from "./Utils/Admin"; // ✅ CORRECTED IMPORT
 import GameDetailsUser from "./components/GameShop/GameDetailsUser";
 
 // Protected Route Component
@@ -112,7 +112,7 @@ function AppContent() {
       <Routes>
         <Route path="/" element={<Home />} />
         <Route path="/games" element={<GameShop />} />
-        {/* // In your App.jsx routes section, add this: */}
+        {/* GameDetailsUser route */}
         <Route path="/game/:id" element={<GameDetailsUser />} />
         
         {/* ✅ Checkout Routes */}
@@ -122,15 +122,13 @@ function AppContent() {
           </ProtectedRoute>
         } />
         
-        {/* ❌ GameDetails routes সরিয়ে দিন - AdminDashboard এর ভিতরে handle হবে */}
-        
         <Route path="/profile/dashboard" element={
           <ProtectedRoute>
             <Dashboard />
           </ProtectedRoute>
         } />
         
-        {/* ✅ Admin Routes - GameDetails এখানে handle হবে */}
+        {/* ✅ Admin Routes */}
         <Route path="/admin/dashboard/*" element={
           <AdminRoute>
             <AdminDashboard />

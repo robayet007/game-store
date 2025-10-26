@@ -16,7 +16,7 @@ import Login from "./Auth/Login";
 import Dashboard from "./components/Dashboard/Dashboard";
 import ForgotPassword from "./Auth/ForgotPassword";
 import AdminDashboard from "./components/Admin/AdminDashboard";
-// import { isAdminUser } from "./Utils/Admin"; // ✅ CORRECTED IMPORT
+import { isAdminUser } from "./Utils/Admin"; // ✅ CORRECTED IMPORT
 import GameDetailsUser from "./components/GameShop/GameDetailsUser";
 
 // Protected Route Component

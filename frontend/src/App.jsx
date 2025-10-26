@@ -1,3 +1,4 @@
+// App.jsx - GameDetails route গুলো সরিয়ে দিন
 import { BrowserRouter as Router, Routes, Route, useLocation, Navigate } from "react-router-dom";
 import { useEffect, useState } from "react";
 import { onAuthStateChanged } from "firebase/auth";
@@ -16,6 +17,7 @@ import Dashboard from "./components/Dashboard/Dashboard";
 import ForgotPassword from "./Auth/ForgotPassword";
 import AdminDashboard from "./components/Admin/AdminDashboard";
 import { isAdminUser } from "./utils/admin";
+import GameDetailsUser from "./components/GameShop/GameDetailsUser";
 
 // Protected Route Component
 const ProtectedRoute = ({ children }) => {
@@ -87,7 +89,7 @@ function AppContent() {
   
   const isDashboard = location.pathname === "/dashboard" || location.pathname === "/profile/dashboard";
   const isAdminDashboard = location.pathname === "/admin/dashboard";
-  const isCheckoutPage = location.pathname === "/checkout";
+  const isCheckoutPage = location.pathname.startsWith("/checkout");
   const isAuthPage = location.pathname === "/profile/login" || 
                     location.pathname === "/profile/register" || 
                     location.pathname === "/forgot-password";
@@ -97,13 +99,10 @@ function AppContent() {
       console.log('🔐 Auth State Changed - User:', user?.email);
       console.log('📍 Current Path:', location.pathname);
       setUser(user);
-      
-      // ✅ NO AUTO-REDIRECT - শুধু state update
-      // Login.jsx নিজেই handle করবে redirect
     });
 
     return () => unsubscribe();
-  }, [location.pathname]); // ✅ location.pathname dependency
+  }, [location.pathname]);
 
   return (
     <div className="app">
@@ -113,13 +112,17 @@ function AppContent() {
       <Routes>
         <Route path="/" element={<Home />} />
         <Route path="/games" element={<GameShop />} />
+        {/* // In your App.jsx routes section, add this: */}
+        <Route path="/game/:id" element={<GameDetailsUser />} />
         
-        {/* Protected Routes */}
-        <Route path="/checkout" element={
+        {/* ✅ Checkout Routes */}
+        <Route path="/checkout/:id" element={
           <ProtectedRoute>
             <Checkout />
           </ProtectedRoute>
         } />
+        
+        {/* ❌ GameDetails routes সরিয়ে দিন - AdminDashboard এর ভিতরে handle হবে */}
         
         <Route path="/profile/dashboard" element={
           <ProtectedRoute>
@@ -127,8 +130,8 @@ function AppContent() {
           </ProtectedRoute>
         } />
         
-        {/* ✅ Admin Routes */}
-        <Route path="/admin/dashboard" element={
+        {/* ✅ Admin Routes - GameDetails এখানে handle হবে */}
+        <Route path="/admin/dashboard/*" element={
           <AdminRoute>
             <AdminDashboard />
           </AdminRoute>

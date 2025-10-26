@@ -1,6 +1,9 @@
+import { useNavigate } from 'react-router-dom';
 import "./Offers.css"
 
 const OfferCard = ({ product }) => {
+  const navigate = useNavigate();
+  
   // Product data destructure
   const { 
     title, 
@@ -33,29 +36,44 @@ const OfferCard = ({ product }) => {
     return 'https://i.pinimg.com/736x/53/12/73/5312738a7102a3edb2728eea63f636de.jpg';
   };
 
+  // Handle card click - navigate to checkout
+  const handleCardClick = () => {
+    navigate(`/checkout/${product._id || product.id}`, {
+      state: {
+        product: {
+          id: product._id || product.id,
+          title: productName,
+          image: getImageUrl(productImage),
+          category: 'special-offers',
+          price: price,
+          description: productDescription,
+          originalPrice: Math.round(price * 1.1) // Show 10% discount
+        }
+      }
+    });
+  };
+
   return (
-    <>
-      <div className="deal-card">
-        <div className="deal-card-info">
-          <img
-            src={getImageUrl(productImage)}
-            alt={productName}
-            onError={(e) => {
-              e.target.src = 'https://i.pinimg.com/736x/53/12/73/5312738a7102a3edb2728eea63f636de.jpg';
-            }}
-          />
-          <div>
-            <p className="deal-card-title">{productName}</p>
-            <p className="deal-card-des">{productDescription}</p>
-          </div>
-        </div>
-        <hr />
-        <div className="deal-card-price">
-          <div className="discount-price">৳ {discountPrice}</div>
-          <div className="card-price">৳ {price}</div>
+    <div className="deal-card" onClick={handleCardClick}>
+      <div className="deal-card-info">
+        <img
+          src={getImageUrl(productImage)}
+          alt={productName}
+          onError={(e) => {
+            e.target.src = 'https://i.pinimg.com/736x/53/12/73/5312738a7102a3edb2728eea63f636de.jpg';
+          }}
+        />
+        <div>
+          <p className="deal-card-title">{productName}</p>
+          <p className="deal-card-des">{productDescription}</p>
         </div>
       </div>
-    </>
+      <hr />
+      <div className="deal-card-price">
+        <div className="discount-price">৳ {discountPrice}</div>
+        <div className="card-price">৳ {price}</div>
+      </div>
+    </div>
   );
 };
 

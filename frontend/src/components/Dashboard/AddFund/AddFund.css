@@ -1,0 +1,351 @@
+.add-fund-container {
+  max-width: 600px;
+  margin: 0 auto;
+  background: white;
+  padding: 20px;
+  border-radius: 16px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+}
+
+/* Balance Cards Layout */
+.balance-cards {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px;
+  margin-bottom: 30px;
+}
+
+.balance-card {
+  padding: 25px;
+  border-radius: 16px;
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.12);
+  border: 1px solid #e8e8e8;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.balance-card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+}
+
+.balance-card.available {
+  background: linear-gradient(135deg, #00A86B 0%, #008055 100%);
+  color: white;
+  border: none;
+}
+
+.balance-card.pending {
+  background: linear-gradient(135deg, #FF6B35 0%, #E55A2B 100%);
+  color: white;
+  border: none;
+}
+
+.balance-header {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  margin-bottom: 10px;
+}
+
+.balance-icon {
+  background: rgba(255, 255, 255, 0.2);
+  padding: 12px;
+  border-radius: 50%;
+  backdrop-filter: blur(10px);
+}
+
+.balance-info h4 {
+  margin: 0;
+  font-size: 14px;
+  opacity: 0.95;
+  font-weight: 500;
+  color: inherit;
+}
+
+.balance-amount {
+  font-size: 28px;
+  font-weight: 700;
+  margin: 5px 0 0 0;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  color: inherit;
+}
+
+.balance-note {
+  margin: 15px 0 0 0;
+  opacity: 0.9;
+  font-size: 13px;
+  line-height: 1.4;
+  color: inherit;
+}
+
+/* Add Balance Section */
+.add-balance-section {
+  background: #fafafa;
+  padding: 25px;
+  border-radius: 12px;
+  border: 1px solid #e8e8e8;
+}
+
+.add-balance-section h4 {
+  margin-bottom: 20px;
+  color: #1a1a1a;
+  font-weight: 600;
+  font-size: 20px;
+  text-align: center;
+}
+
+/* Payment Error */
+.payment-error {
+  background: #fee;
+  color: #c53030;
+  padding: 12px 16px;
+  border-radius: 8px;
+  margin-bottom: 20px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-weight: 600;
+  border: 1px solid #fed7d7;
+}
+
+/* Success Message */
+.success-message {
+  background: #f0fff4;
+  color: #22543d;
+  padding: 12px 16px;
+  border-radius: 8px;
+  margin-bottom: 20px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-weight: 600;
+  border: 1px solid #c6f6d5;
+}
+
+/* Quick Amount Section */
+.quick-amount-section {
+  margin-bottom: 25px;
+}
+
+.quick-amount-section h5 {
+  margin-bottom: 15px;
+  color: #374151;
+  font-size: 15px;
+  font-weight: 600;
+}
+
+.quick-amount-buttons {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
+  gap: 12px;
+  margin-bottom: 20px;
+}
+
+.quick-amount-btn {
+  padding: 14px 10px;
+  border: 2px solid #d1d5db;
+  background: white;
+  border-radius: 10px;
+  cursor: pointer;
+  font-weight: 600;
+  color: #374151;
+  transition: all 0.3s ease;
+  font-size: 15px;
+}
+
+.quick-amount-btn:hover {
+  border-color: #E2136E;
+  background: #fdf2f8;
+  color: #E2136E;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(226, 19, 110, 0.15);
+}
+
+.quick-amount-btn.selected {
+  border-color: #E2136E;
+  background: #E2136E;
+  color: white;
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(226, 19, 110, 0.3);
+}
+
+.quick-amount-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  transform: none;
+}
+
+/* Form Styles */
+.add-balance-form {
+  margin-bottom: 25px;
+}
+
+.add-balance-form .form-group {
+  margin-bottom: 25px;
+}
+
+.add-balance-form label {
+  display: block;
+  margin-bottom: 10px;
+  font-weight: 600;
+  color: #374151;
+  font-size: 15px;
+}
+
+.add-balance-form input {
+  width: 100%;
+  padding: 14px 16px;
+  border: 2px solid #d1d5db;
+  background: white;
+  border-radius: 10px;
+  font-size: 16px;
+  transition: all 0.3s ease;
+  color: #1a1a1a;
+  font-weight: 500;
+}
+
+.add-balance-form input:focus {
+  outline: none;
+  border-color: #E2136E;
+  background: white;
+  box-shadow: 0 0 0 3px rgba(226, 19, 110, 0.1);
+}
+
+.add-balance-form input:disabled {
+  background: #f9fafb;
+  color: #6b7280;
+  cursor: not-allowed;
+}
+
+.add-balance-form small {
+  color: #6b7280;
+  font-size: 12px;
+  margin-top: 5px;
+  display: block;
+}
+
+.add-balance-btn {
+  width: 100%;
+  padding: 16px;
+  background: linear-gradient(135deg, #E2136E 0%, #C1105F 100%);
+  color: white;
+  border: none;
+  border-radius: 10px;
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  transition: all 0.3s ease;
+  margin-bottom: 20px;
+}
+
+.add-balance-btn:hover:not(:disabled) {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(226, 19, 110, 0.4);
+  background: linear-gradient(135deg, #C1105F 0%, #A00E4F 100%);
+}
+
+.add-balance-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  transform: none;
+  box-shadow: none;
+}
+
+/* Simple Payment Instructions */
+.payment-instructions-simple {
+  background: #f8fafc;
+  padding: 20px;
+  border-radius: 12px;
+  margin-top: 25px;
+  border-left: 4px solid #00A86B;
+}
+
+.payment-instructions-simple h5 {
+  color: #1a1a1a;
+  margin-bottom: 15px;
+  font-size: 16px;
+  font-weight: 600;
+}
+
+.payment-instructions-simple ol {
+  margin: 0;
+  padding-left: 20px;
+  color: #4b5563;
+}
+
+.payment-instructions-simple li {
+  margin-bottom: 8px;
+  line-height: 1.5;
+  color: #4b5563;
+}
+
+.payment-instructions-simple strong {
+  color: #E2136E;
+  font-weight: 600;
+}
+
+/* Spinner */
+.spinner {
+  width: 18px;
+  height: 18px;
+  border: 2px solid transparent;
+  border-top: 2px solid white;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .add-fund-container {
+    padding: 15px;
+    margin: 10px;
+  }
+  
+  .balance-cards {
+    grid-template-columns: 1fr;
+    gap: 15px;
+  }
+  
+  .balance-amount {
+    font-size: 24px;
+  }
+  
+  .add-balance-section {
+    padding: 20px;
+  }
+  
+  .quick-amount-buttons {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  
+  .payment-instructions-simple {
+    padding: 15px;
+  }
+}
+
+/* Dark text colors for better readability */
+.add-balance-section,
+.quick-amount-section,
+.add-balance-form {
+  color: #1a1a1a;
+}
+
+.add-balance-section h4,
+.quick-amount-section h5,
+.add-balance-form label {
+  color: #1a1a1a;
+}
+
+.payment-instructions-simple,
+.payment-instructions-simple li {
+  color: #374151;
+}

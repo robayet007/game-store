@@ -31,6 +31,16 @@ const productSchema = new mongoose.Schema({
     type: String,
     enum: ['active', 'inactive'],
     default: 'active'
+  },
+  // ✅ NEW: For nested products (game packages)
+  gameId: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'Product',
+    default: null // null means it's a main game, not a package
+  },
+  isGamePackage: {
+    type: Boolean,
+    default: false // true if this is a package under a game
   }
 }, { 
   timestamps: true 

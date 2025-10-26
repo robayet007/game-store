@@ -11,6 +11,9 @@ export const productAPI = {
   // Get products by category
   getProductsByCategory: (category) => API.get(`/products/category/${category}`),
   
+  // ✅ NEW - Get game packages for a specific game
+  getGamePackages: (gameId) => API.get(`/products/game/${gameId}/packages`),
+  
   // Get single product
   getProductById: (id) => API.get(`/products/${id}`),
   

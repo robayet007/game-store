@@ -4,7 +4,7 @@ import fs from "fs";
 // Create a new product
 export const createProduct = async (req, res) => {
   try {
-    const { category, title, price, description } = req.body;
+    const { category, title, price, description, gameId } = req.body;
     
     // Validate required fields
     if (!category || !title || !price || !description) {
@@ -19,19 +19,35 @@ export const createProduct = async (req, res) => {
       image = `/uploads/${req.file.filename}`;
     }
 
+    // ✅ Check if this is a game package
+    const isGamePackage = gameId && gameId !== 'null' && gameId !== '';
+    
+    // ✅ If it's a game package, verify the parent game exists
+    if (isGamePackage) {
+      const parentGame = await Product.findById(gameId);
+      if (!parentGame) {
+        return res.status(400).json({
+          success: false,
+          message: "Parent game not found"
+        });
+      }
+    }
+
     const product = new Product({ 
       category, 
       title, 
       price, 
       description, 
-      image  // ✅ Change imageUrl to image
+      image,
+      gameId: isGamePackage ? gameId : null,
+      isGamePackage: isGamePackage
     });
     
     await product.save();
     
     res.status(201).json({
       success: true,
-      message: "Product created successfully",
+      message: isGamePackage ? "Game package created successfully" : "Product created successfully",
       product
     });
   } catch (error) {
@@ -46,11 +62,14 @@ export const createProduct = async (req, res) => {
 // Get all products
 export const getProducts = async (req, res) => {
   try {
-    const { category } = req.query;
+    const { category, gameId } = req.query;
     
     let filter = {};
     if (category) {
       filter.category = category;
+    }
+    if (gameId) {
+      filter.gameId = gameId;
     }
     filter.status = 'active';
 
@@ -77,7 +96,8 @@ export const getProductsByCategory = async (req, res) => {
     
     const products = await Product.find({ 
       category, 
-      status: 'active' 
+      status: 'active',
+      isGamePackage: false // Only main games, not packages
     }).sort({ createdAt: -1 });
 
     res.json({
@@ -85,6 +105,32 @@ export const getProductsByCategory = async (req, res) => {
       count: products.length,
       category,
       products
+    });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ 
+      success: false,
+      message: "Server error" 
+    });
+  }
+};
+
+// ✅ NEW - Get game packages for a specific game
+export const getGamePackages = async (req, res) => {
+  try {
+    const { gameId } = req.params;
+    
+    const packages = await Product.find({ 
+      gameId: gameId,
+      status: 'active',
+      isGamePackage: true
+    }).sort({ createdAt: -1 });
+
+    res.json({
+      success: true,
+      count: packages.length,
+      gameId,
+      packages
     });
   } catch (error) {
     console.error(error);

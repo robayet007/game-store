@@ -1,11 +1,14 @@
+// components/Admin/AdminDashboard.jsx
 import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Routes, Route, useLocation } from 'react-router-dom';
 import { signOut } from 'firebase/auth';
 import { auth } from '../../firebaseConfig';
 import { isAdminUser } from '../../utils/admin';
 import Sidebar from './Sidebar/Sidebar';
 import AddProduct from './AddProduct/AddProduct';
 import CategoryView from './CatagoryProduct/CategoryProduct';
+import GameDetails from './GameDetails/GameDetails'; // ✅ Import GameDetails
+import AddGameProduct from './AddGameProduct/AddGameProduct'; // ✅ Import AddGameProduct
 import { useProducts } from '../../hooks/useProducts';
 import './AdminDashboard.css';
 
@@ -14,7 +17,6 @@ const AdminDashboard = () => {
   const [selectedCategory, setSelectedCategory] = useState('subscription');
   const [editingProduct, setEditingProduct] = useState(null);
 
-  // Use the custom hook for products
   const { 
     products, 
     loading, 
@@ -26,7 +28,11 @@ const AdminDashboard = () => {
   } = useProducts(selectedCategory);
 
   const navigate = useNavigate();
+  const location = useLocation();
   const user = auth.currentUser;
+
+  // Check if current route is a game details route
+  const isGameDetailsRoute = location.pathname.includes('/admin/dashboard/game/');
 
   if (!isAdminUser(user)) {
     navigate('/');
@@ -42,7 +48,7 @@ const AdminDashboard = () => {
     }
   };
 
-  // Add Product Function - Now connects to backend
+  // Add Product Function
   const addNewProduct = async (productData) => {
     const result = await addProduct(productData);
     
@@ -53,7 +59,7 @@ const AdminDashboard = () => {
     }
   };
 
-  // Edit Product Function - Now connects to backend
+  // Edit Product Function
   const editProduct = async (productId, updatedData) => {
     const result = await updateProduct(productId, updatedData);
     
@@ -65,7 +71,7 @@ const AdminDashboard = () => {
     }
   };
 
-  // Delete Product Function - Now connects to backend
+  // Delete Product Function
   const deleteProductHandler = async (productId) => {
     if (window.confirm('Are you sure you want to delete this product?')) {
       const result = await deleteProduct(productId);
@@ -84,7 +90,8 @@ const AdminDashboard = () => {
     setActiveSection('add-product');
   };
 
-  const renderContent = () => {
+  // Render main admin content
+  const renderAdminContent = () => {
     if (activeSection === 'add-product') {
       return (
         <AddProduct 
@@ -107,7 +114,7 @@ const AdminDashboard = () => {
   };
 
   // Show loading or error states
-  if (loading && activeSection !== 'add-product') {
+  if (loading && activeSection !== 'add-product' && !isGameDetailsRoute) {
     return (
       <div className="admin-dashboard">
         <Sidebar 
@@ -130,7 +137,7 @@ const AdminDashboard = () => {
     );
   }
 
-  if (error && activeSection !== 'add-product') {
+  if (error && activeSection !== 'add-product' && !isGameDetailsRoute) {
     return (
       <div className="admin-dashboard">
         <Sidebar 
@@ -160,32 +167,43 @@ const AdminDashboard = () => {
 
   return (
     <div className="admin-dashboard">
-      {/* Sidebar */}
-      <Sidebar 
-        activeSection={activeSection}
-        selectedCategory={selectedCategory}
-        onSectionChange={setActiveSection}
-        onCategoryChange={setSelectedCategory}
-      />
+      {/* Show sidebar only if not in game details route */}
+      {!isGameDetailsRoute && (
+        <Sidebar 
+          activeSection={activeSection}
+          selectedCategory={selectedCategory}
+          onSectionChange={setActiveSection}
+          onCategoryChange={setSelectedCategory}
+        />
+      )}
 
       {/* Main Content */}
-      <div className="admin-main">
-        {/* Header */}
-        <header className="admin-header">
-          <div className="header-content">
-            <h1>🎮 MetaGameShop Admin</h1>
-            <div className="header-actions">
-              <span>Welcome, {user?.email}</span>
-              <button onClick={handleLogout} className="logout-btn">
-                🚪 Logout
-              </button>
+      <div className={`admin-main ${isGameDetailsRoute ? 'full-width' : ''}`}>
+        {/* Header - show only if not in game details route */}
+        {!isGameDetailsRoute && (
+          <header className="admin-header">
+            <div className="header-content">
+              <h1>🎮 MetaGameShop Admin</h1>
+              <div className="header-actions">
+                <span>Welcome, {user?.email}</span>
+                <button onClick={handleLogout} className="logout-btn">
+                  🚪 Logout
+                </button>
+              </div>
             </div>
-          </div>
-        </header>
+          </header>
+        )}
 
-        {/* Content Area */}
+        {/* Content Area with Nested Routes */}
         <main className="content-area">
-          {renderContent()}
+          <Routes>
+            {/* Main admin routes */}
+            <Route path="/" element={renderAdminContent()} />
+            
+            {/* Game details routes */}
+            <Route path="/game/:id" element={<GameDetails />} />
+            <Route path="/game/:id/add-product" element={<AddGameProduct />} />
+          </Routes>
         </main>
       </div>
     </div>

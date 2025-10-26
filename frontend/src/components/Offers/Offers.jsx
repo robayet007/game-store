@@ -7,7 +7,7 @@ const Offers = () => {
 
   if (loading) {
     return (
-      <div>
+      <div style={{ padding: '20px' }}>
         <h1 className="text-3xl">Special Offers</h1>
         <div className="loading">
           <p>Loading special offers...</p>
@@ -18,7 +18,7 @@ const Offers = () => {
 
   if (error) {
     return (
-      <div>
+      <div style={{ padding: '20px' }}>
         <h1 className="text-3xl">Special Offers</h1>
         <div className="error">
           <p>Error: {error}</p>
@@ -28,25 +28,23 @@ const Offers = () => {
   }
 
   return (
-    <>
-      <div>
-        <h1 className="text-3xl">Special Offers</h1>
-        {products.length === 0 ? (
-          <div className="no-offers">
-            <p>No special offers available</p>
-          </div>
-        ) : (
-          <div className="offer-cards">
-            {products.map(product => (
-              <OfferCard 
-                key={product._id || product.id}
-                product={product}
-              />
-            ))}
-          </div>
-        )}
-      </div>
-    </>
+    <div style={{ padding: '20px' }}>
+      <h1 className="text-3xl">Special Offers</h1>
+      {products.length === 0 ? (
+        <div className="no-offers">
+          <p>No special offers available</p>
+        </div>
+      ) : (
+        <div className="offer-cards">
+          {products.map(product => (
+            <OfferCard 
+              key={product._id || product.id}
+              product={product}
+            />
+          ))}
+        </div>
+      )}
+    </div>
   )
 }
 

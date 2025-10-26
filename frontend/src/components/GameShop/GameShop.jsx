@@ -1,123 +1,95 @@
 "use client"
 
 import { useState } from "react";
-import { Link } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
+import { useProducts } from '../../hooks/useProducts';
 import "./GameShop.css";
-
-const gamesData = [
-  {
-    id: 1,
-    name: "Free Fire",
-    slug: "freefire",
-    image: "https://images.unsplash.com/photo-1552820728-8b83bb6b773f?w=400&h=300&fit=crop",
-    category: "Battle Royale",
-    price: "available",
-    rating: 4.5,
-    players: "500M+"
-  },
-  {
-    id: 2,
-    name: "PUBG Mobile",
-    slug: "pubg",
-    image: "https://images.unsplash.com/photo-1550745165-9bc0b252726f?w=400&h=300&fit=crop",
-    category: "Battle Royale",
-    price: "available",
-    rating: 4.8,
-    players: "1B+"
-  },
-  {
-    id: 3,
-    name: "E-Football",
-    slug: "efootball",
-    image: "https://images.unsplash.com/photo-1575361204480-aadea25e6e68?w=400&h=300&fit=crop",
-    category: "Sports",
-    price: "available",
-    rating: 4.3,
-    players: "300M+"
-  },
-  {
-    id: 4,
-    name: "Clash of Clans",
-    slug: "clashofclans",
-    image: "https://images.unsplash.com/photo-1534423861386-85a16f5d13fd?w=400&h=300&fit=crop",
-    category: "Strategy",
-    price: "available",
-    rating: 4.7,
-    players: "500M+"
-  },
-  {
-    id: 5,
-    name: "Call of Duty",
-    slug: "callofduty",
-    image: "https://images.unsplash.com/photo-1542751371-adc38448a05e?w=400&h=300&fit=crop",
-    category: "FPS",
-    price: "available",
-    rating: 4.6,
-    players: "500M+"
-  },
-  {
-    id: 6,
-    name: "Valorant",
-    slug: "valorant",
-    image: "https://images.unsplash.com/photo-1614680376573-df3480f0c6ff?w=400&h=300&fit=crop",
-    category: "FPS",
-    price: "available",
-    rating: 4.4,
-    players: "200M+"
-  },
-  {
-    id: 7,
-    name: "Mobile Legends",
-    slug: "mobilelegends",
-    image: "https://images.unsplash.com/photo-1542751110-97427bbecf20?w=400&h=300&fit=crop",
-    category: "MOBA",
-    price: "available",
-    rating: 4.2,
-    players: "1B+"
-  },
-  {
-    id: 8,
-    name: "Genshin Impact",
-    slug: "genshinimpact",
-    image: "https://images.unsplash.com/photo-1635863138275-d9b33299680a?w=400&h=300&fit=crop",
-    category: "RPG",
-    price: "available",
-    rating: 4.9,
-    players: "400M+"
-  },
-  {
-    id: 9,
-    name: "Clash Royale",
-    slug: "clashroyale",
-    image: "https://images.unsplash.com/photo-1585504198191-3c1b143d0b8d?w=400&h=300&fit=crop",
-    category: "Strategy",
-    price: "available",
-    rating: 4.5,
-    players: "300M+"
-  },
-  {
-    id: 10,
-    name: "Fortnite",
-    slug: "fortnite",
-    image: "https://images.unsplash.com/photo-1542751110-97427bbecf20?w=400&h=300&fit=crop",
-    category: "Battle Royale",
-    price: "available",
-    rating: 4.7,
-    players: "350M+"
-  }
-];
 
 const categories = ["All", "Battle Royale", "FPS", "MOBA", "Sports", "Strategy", "RPG"];
 
 function GameShop() {
   const [selectedCategory, setSelectedCategory] = useState("All");
   const [searchQuery, setSearchQuery] = useState("");
+  const navigate = useNavigate();
+  
+  // Use your hook to fetch game shop products
+  const { products, loading, error } = useProducts('game-topup');
 
-  const filteredGames = gamesData.filter(game => {
-    const matchesCategory = selectedCategory === "All" || game.category === selectedCategory;
-    const matchesSearch = game.name.toLowerCase().includes(searchQuery.toLowerCase());
+  const filteredGames = products.filter(game => {
+    const matchesCategory = selectedCategory === "All" || (game.category && game.category === selectedCategory);
+    const matchesSearch = (game.title || game.name).toLowerCase().includes(searchQuery.toLowerCase());
     return matchesCategory && matchesSearch;
   });
+
+  // ✅ UPDATE: Handle card click - navigate to game details page
+  const handleCardClick = (game) => {
+    navigate(`/game/${game._id || game.id}`, {
+      state: {
+        game: game
+      }
+    });
+  };
+
+  // Handle "Top Up Now" button click - navigate to checkout
+  const handleTopUpClick = (game, e) => {
+    e.stopPropagation(); // Prevent card click event
+    navigate(`/checkout/${game._id || game.id}`, {
+      state: {
+        product: {
+          id: game._id || game.id,
+          title: game.title || game.name,
+          image: getImageUrl(game.image || game.imageUrl),
+          category: game.category || "Game",
+          price: game.price || 0,
+          description: game.description || "Game top-up service"
+        }
+      }
+    });
+  };
+
+  // Handle "Details" button click - navigate to game details page
+  const handleDetailsClick = (game, e) => {
+    e.stopPropagation(); // Prevent card click event
+    navigate(`/game/${game._id || game.id}`, {
+      state: {
+        game: game
+      }
+    });
+  };
+
+  // Loading state
+  if (loading) {
+    return (
+      <div className="gameshop-wrapper">
+        <div className="gameshop-container">
+          <div className="gameshop-header">
+            <h1 className="gameshop-title">Game Shop</h1>
+            <p className="gameshop-subtitle">Discover and play amazing mobile games</p>
+          </div>
+          <div className="loading">
+            <p>Loading games...</p>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  // Error state
+  if (error) {
+    return (
+      <div className="gameshop-wrapper">
+        <div className="gameshop-container">
+          <div className="gameshop-header">
+            <h1 className="gameshop-title">Game Shop</h1>
+            <p className="gameshop-subtitle">Discover and play amazing mobile games</p>
+          </div>
+          <div className="error">
+            <p>Error: {error}</p>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="gameshop-wrapper">
@@ -159,54 +131,90 @@ function GameShop() {
         {/* Games Grid */}
         <div className="games-grid">
           {filteredGames.map(game => (
-            <Link 
-              key={game.id} 
-              to={`/games/${game.slug}`} 
+            <div 
+              key={game._id || game.id} 
               className="game-card"
+              onClick={() => handleCardClick(game)}
             >
               <div className="game-image-container">
                 <img 
-                  src={game.image} 
-                  alt={game.name}
+                  src={getImageUrl(game.image || game.imageUrl)} 
+                  alt={game.title || game.name}
                   className="game-image"
                   loading="lazy"
+                  onError={(e) => {
+                    e.target.src = 'https://images.unsplash.com/photo-1550745165-9bc0b252726f?w=400&h=300&fit=crop';
+                  }}
                 />
                 <div className="game-overlay">
-                  <span className="game-category">{game.category}</span>
-                  <span className="game-price">{game.price}</span>
+                  <span className="game-category">{game.category || "Game"}</span>
+                  <span className="game-price">available</span>
                 </div>
               </div>
 
               <div className="game-info">
-                <h3 className="game-name">{game.name}</h3>
+                <h3 className="game-name">{game.title || game.name}</h3>
                 
                 <div className="game-stats">
                   <div className="game-rating">
                     <span className="rating-stars">★★★★★</span>
-                    <span className="rating-value">{game.rating}</span>
+                    <span className="rating-value">4.5</span>
                   </div>
-                  <span className="game-players">{game.players}</span>
+                  <span className="game-players">100M+</span>
                 </div>
 
                 <div className="game-actions">
-                  <button className="play-now-btn">Top Up Now</button>
-                  <button className="details-btn">Details</button>
+                  <button 
+                    className="play-now-btn"
+                    onClick={(e) => handleTopUpClick(game, e)}
+                  >
+                    Top Up Now
+                  </button>
+                  <button 
+                    className="details-btn"
+                    onClick={(e) => handleDetailsClick(game, e)}
+                  >
+                    Details
+                  </button>
                 </div>
               </div>
-            </Link>
+            </div>
           ))}
         </div>
 
         {/* No Results Message */}
-        {filteredGames.length === 0 && (
+        {filteredGames.length === 0 && products.length > 0 && (
           <div className="no-results">
             <h3>No games found</h3>
             <p>Try adjusting your search or filter criteria</p>
+          </div>
+        )}
+
+        {/* No Products Message */}
+        {products.length === 0 && (
+          <div className="no-results">
+            <h3>No games available</h3>
+            <p>Check back later for new game additions</p>
           </div>
         )}
       </div>
     </div>
   );
 }
+
+// Image URL handler function
+const getImageUrl = (imgPath) => {
+  if (!imgPath) return 'https://images.unsplash.com/photo-1550745165-9bc0b252726f?w=400&h=300&fit=crop';
+  
+  if (imgPath.startsWith('http')) {
+    return imgPath;
+  }
+  
+  if (imgPath.startsWith('/uploads/')) {
+    return `http://localhost:5000${imgPath}`;
+  }
+  
+  return 'https://images.unsplash.com/photo-1550745165-9bc0b252726f?w=400&h=300&fit=crop';
+};
 
 export default GameShop;

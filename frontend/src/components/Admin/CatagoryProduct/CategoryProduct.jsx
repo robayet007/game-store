@@ -1,7 +1,9 @@
 import React from 'react';
+import { useNavigate } from 'react-router-dom';
 import './CategoryProduct.css';
 
 const CategoryProduct = ({ category, products, onEditProduct, onDeleteProduct }) => {
+  const navigate = useNavigate();
   const categoryNames = {
     'subscription': '👑 Subscription Products',
     'special-offers': '⭐ Special Offers', 
@@ -91,6 +93,17 @@ const CategoryProduct = ({ category, products, onEditProduct, onDeleteProduct })
 
               {/* Product Actions */}
               <div className="product-actions">
+                {/* Game Shop Category এর জন্য বিশেষ action */}
+                {category === 'game-topup' && (
+                  <button
+                    onClick={() => navigate(`/admin/dashboard/game/${product._id || product.id}`)}
+                    className="manage-btn"
+                    title="Manage this game's products"
+                  >
+                    🎮 Manage Products
+                  </button>
+                )}
+                
                 <button
                   onClick={() => onEditProduct(product)}
                   className="edit-btn"

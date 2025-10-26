@@ -22,8 +22,20 @@ const Subscriptions = () => {
     return 'https://via.placeholder.com/100x100/667eea/ffffff?text=SUB';
   };
 
+  // ✅ UPDATE: Handle item click - navigate to checkout page
   const handleItemClick = (product) => {
-    navigate(`/subscription/${product._id || product.id}`);
+    navigate(`/checkout/${product._id || product.id}`, {
+      state: {
+        product: {
+          id: product._id || product.id,
+          title: product.title || product.name,
+          image: getImageUrl(product.image || product.imageUrl),
+          category: product.category || "Subscription",
+          price: product.price || 0,
+          description: product.description || 'Subscription service'
+        }
+      }
+    });
   };
 
   if (loading) {
@@ -97,11 +109,11 @@ const Subscriptions = () => {
                   </div>
                 </div>
                 <div className="card-badge">
-                  <span>Gaming</span>
+                  <span>Subscribe</span>
                 </div>
               </div>
               <div className="card-overlay-horizontal">
-                <span>Click to Explore</span>
+                <span>Click to Purchase</span>
               </div>
             </div>
           ))

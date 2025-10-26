@@ -8,7 +8,8 @@ import {
   getProductById,
   updateProduct,
   deleteProduct,
-  getProductsByCategory  // ✅ Import the new function
+  getProductsByCategory,  // ✅ Import the new function
+  getGamePackages  // ✅ Import game packages function
 } from "../controllers/productController.js";
 
 const router = express.Router();
@@ -32,6 +33,7 @@ const upload = multer({ storage });
 router.post("/", upload.single("image"), createProduct);
 router.get("/", getProducts);
 router.get("/category/:category", getProductsByCategory); // ✅ Use the imported function
+router.get("/game/:gameId/packages", getGamePackages); // ✅ NEW - Get packages for a game
 router.get("/:id", getProductById);
 router.put("/:id", upload.single("image"), updateProduct);
 router.delete("/:id", deleteProduct);

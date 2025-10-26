@@ -10,7 +10,8 @@ import {
   LogOut,
   Home,
   Mail,
-  Calendar
+  Calendar,
+  DollarSign
 } from 'lucide-react';
 import { 
   onAuthStateChanged, 
@@ -20,6 +21,7 @@ import {
   signOut 
 } from 'firebase/auth';
 import { auth } from '../../firebaseConfig';
+import AddFund from './AddFund/AddFund'; // AddFund.jsx import করছি
 import './Dashboard.css';
 
 const Dashboard = () => {
@@ -38,16 +40,17 @@ const Dashboard = () => {
   const [passwordError, setPasswordError] = useState('');
   const [passwordSuccess, setPasswordSuccess] = useState('');
 
+  // Balance state
+  const [balance, setBalance] = useState(0);
+
   // Auth state listener
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
-      console.log('Auth State Changed:', currentUser); // Debug log
+      console.log('Auth State Changed:', currentUser);
       setUser(currentUser);
       setLoading(false);
       
-      // যদি user null হয় (logout), তাহলে home e navigate করবে
       if (!currentUser) {
-        console.log('No user found, navigating to home'); // Debug log
         navigate('/');
       }
     });
@@ -66,8 +69,12 @@ const Dashboard = () => {
       gameIcon: '🎮',
       orderId: 'MG001'
     },
-    // ... আপনার existing orders data
   ];
+
+  // Balance update function
+  const handleBalanceUpdate = (amount) => {
+    setBalance(prevBalance => prevBalance + amount);
+  };
 
   const getStatusIcon = (status) => {
     switch (status) {
@@ -135,10 +142,9 @@ const Dashboard = () => {
 
   const handleLogout = async () => {
     try {
-      console.log('Logout button clicked'); // Debug log
+      console.log('Logout button clicked');
       await signOut(auth);
-      console.log('SignOut completed'); // Debug log
-      // Navigation will be handled by the useEffect auth listener
+      console.log('SignOut completed');
     } catch (error) {
       console.error('Logout error:', error);
     }
@@ -158,7 +164,6 @@ const Dashboard = () => {
     });
   };
 
-  // যদি user না থাকে (logout হয়ে যায়), তাহলে loading show করবে
   if (!user && !loading) {
     return (
       <div className="dashboard-loading">
@@ -172,7 +177,6 @@ const Dashboard = () => {
       return <div className="loading">Loading...</div>;
     }
 
-    // ... আপনার existing renderContent code
     switch (activeTab) {
       case 'orders':
         return (
@@ -221,6 +225,17 @@ const Dashboard = () => {
                 </div>
               ))}
             </div>
+          </div>
+        );
+
+      case 'balance':
+        return (
+          <div className="balance-section">
+            {/* AddFund component show করবে যখন Balance tab active হবে */}
+            <AddFund 
+              currentBalance={balance}
+              onBalanceUpdate={handleBalanceUpdate}
+            />
           </div>
         );
 
@@ -356,6 +371,14 @@ const Dashboard = () => {
                 </div>
                 
                 <div className="detail-item">
+                  <DollarSign size={18} />
+                  <div className="detail-content">
+                    <label>Meta Balance</label>
+                    <span className="balance-amount-small">৳ {balance.toFixed(2)}</span>
+                  </div>
+                </div>
+                
+                <div className="detail-item">
                   <Package size={18} />
                   <div className="detail-content">
                     <label>Total Orders</label>
@@ -421,6 +444,14 @@ const Dashboard = () => {
             >
               <Package size={20} />
               <span>Orders</span>
+            </button>
+
+            <button 
+              className={`nav-item ${activeTab === 'balance' ? 'active' : ''}`}
+              onClick={() => setActiveTab('balance')}
+            >
+              <DollarSign size={20} />
+              <span>Balance</span>
             </button>
 
             <button 

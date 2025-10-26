@@ -19,6 +19,9 @@ const AddProduct = ({ onAddProduct, onEditProduct, editingProduct, onCancelEdit 
     { value: 'game-topup', label: '🎮 Game Shop' }
   ];
 
+  // Check if current category is game shop
+  const isGameShop = formData.category === 'game-topup';
+
   // If editing product, populate form
   useEffect(() => {
     if (editingProduct) {
@@ -73,14 +76,23 @@ const AddProduct = ({ onAddProduct, onEditProduct, editingProduct, onCancelEdit 
   const handleSubmit = async (e) => {
     e.preventDefault();
     
-    if (!formData.name || !formData.price || !formData.description) {
-      alert('Please fill all required fields');
+    // Validation based on category
+    if (!formData.name) {
+      alert('Product title is required');
       return;
     }
 
-    if (isNaN(formData.price) || Number(formData.price) <= 0) {
-      alert('Please enter a valid price');
-      return;
+    if (!isGameShop) {
+      // For non-game shop categories, validate all fields
+      if (!formData.price || !formData.description) {
+        alert('Please fill all required fields');
+        return;
+      }
+
+      if (isNaN(formData.price) || Number(formData.price) <= 0) {
+        alert('Please enter a valid price');
+        return;
+      }
     }
 
     setIsSubmitting(true);
@@ -90,8 +102,15 @@ const AddProduct = ({ onAddProduct, onEditProduct, editingProduct, onCancelEdit 
       const submitData = new FormData();
       submitData.append('title', formData.name);
       submitData.append('category', formData.category);
-      submitData.append('price', formData.price);
-      submitData.append('description', formData.description);
+      
+      // For game shop, set default values
+      if (isGameShop) {
+        submitData.append('price', '0'); // Default price for game shop
+        submitData.append('description', 'Game shop item'); // Default description
+      } else {
+        submitData.append('price', formData.price);
+        submitData.append('description', formData.description);
+      }
       
       // Append image file if selected
       if (selectedFile) {
@@ -102,8 +121,8 @@ const AddProduct = ({ onAddProduct, onEditProduct, editingProduct, onCancelEdit 
       console.log('Form data:', {
         title: formData.name,
         category: formData.category,
-        price: formData.price,
-        description: formData.description,
+        price: isGameShop ? '0' : formData.price,
+        description: isGameShop ? 'Game shop item' : formData.description,
         hasImage: !!selectedFile
       });
 
@@ -212,6 +231,11 @@ const AddProduct = ({ onAddProduct, onEditProduct, editingProduct, onCancelEdit 
                     </option>
                   ))}
                 </select>
+                {isGameShop && (
+                  <small className="category-note">
+                    🎮 Game Shop: Only title and image are required
+                  </small>
+                )}
               </div>
 
               {/* Product Name */}
@@ -229,41 +253,45 @@ const AddProduct = ({ onAddProduct, onEditProduct, editingProduct, onCancelEdit 
                 />
               </div>
 
-              {/* Price */}
-              <div className="form-group">
-                <label>Price (BDT) *</label>
-                <input
-                  type="number"
-                  name="price"
-                  value={formData.price}
-                  onChange={handleInputChange}
-                  placeholder="Enter price"
-                  className="form-input"
-                  min="0"
-                  step="1"
-                  disabled={isSubmitting}
-                  required
-                />
-              </div>
+              {/* Price - Hide for game shop */}
+              {!isGameShop && (
+                <div className="form-group">
+                  <label>Price (BDT) *</label>
+                  <input
+                    type="number"
+                    name="price"
+                    value={formData.price}
+                    onChange={handleInputChange}
+                    placeholder="Enter price"
+                    className="form-input"
+                    min="0"
+                    step="1"
+                    disabled={isSubmitting}
+                    required
+                  />
+                </div>
+              )}
 
-              {/* Description */}
-              <div className="form-group">
-                <label>Description *</label>
-                <textarea
-                  name="description"
-                  value={formData.description}
-                  onChange={handleInputChange}
-                  placeholder="Enter product description..."
-                  className="form-textarea"
-                  rows="4"
-                  disabled={isSubmitting}
-                  required
-                />
-              </div>
+              {/* Description - Hide for game shop */}
+              {!isGameShop && (
+                <div className="form-group">
+                  <label>Description *</label>
+                  <textarea
+                    name="description"
+                    value={formData.description}
+                    onChange={handleInputChange}
+                    placeholder="Enter product description..."
+                    className="form-textarea"
+                    rows="4"
+                    disabled={isSubmitting}
+                    required
+                  />
+                </div>
+              )}
 
               {/* Image Upload */}
               <div className="form-group">
-                <label>Product Image</label>
+                <label>Product Image {isGameShop && '*'}</label>
                 {!formData.image ? (
                   <div className="image-upload-area">
                     <input
@@ -272,6 +300,7 @@ const AddProduct = ({ onAddProduct, onEditProduct, editingProduct, onCancelEdit 
                       onChange={handleImageChange}
                       className="file-input"
                       disabled={isSubmitting}
+                      required={isGameShop}
                     />
                     <div className="upload-placeholder">
                       <span className="upload-icon">📁</span>
@@ -319,6 +348,11 @@ const AddProduct = ({ onAddProduct, onEditProduct, editingProduct, onCancelEdit 
               {/* Required fields note */}
               <div className="form-note">
                 <small>* Required fields</small>
+                {isGameShop && (
+                  <small className="game-shop-note">
+                    🎮 For Game Shop: Only title and image are required. Price and description will be set automatically.
+                  </small>
+                )}
               </div>
             </form>
           </div>

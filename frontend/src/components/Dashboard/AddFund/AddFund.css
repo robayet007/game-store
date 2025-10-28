@@ -255,37 +255,152 @@
   box-shadow: none;
 }
 
-/* Simple Payment Instructions */
-.payment-instructions-simple {
+/* Payment Instructions */
+.payment-instructions {
   background: #f8fafc;
   padding: 20px;
   border-radius: 12px;
   margin-top: 25px;
   border-left: 4px solid #00A86B;
+  color: #374151;
 }
 
-.payment-instructions-simple h5 {
+.payment-instructions h5 {
   color: #1a1a1a;
   margin-bottom: 15px;
   font-size: 16px;
   font-weight: 600;
 }
 
-.payment-instructions-simple ol {
+.payment-instructions ol {
   margin: 0;
   padding-left: 20px;
   color: #4b5563;
 }
 
-.payment-instructions-simple li {
+.payment-instructions li {
   margin-bottom: 8px;
   line-height: 1.5;
   color: #4b5563;
 }
 
-.payment-instructions-simple strong {
+.payment-instructions strong {
   color: #E2136E;
   font-weight: 600;
+}
+
+.important-note {
+  background: #fff3cd;
+  border: 1px solid #ffeaa7;
+  padding: 1rem;
+  border-radius: 6px;
+  margin-top: 1rem;
+  color: #856404;
+  font-size: 14px;
+}
+
+.important-note strong {
+  color: #856404;
+}
+
+/* Math Challenge Modal */
+.math-challenge-modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+
+.math-challenge-content {
+  background: white;
+  padding: 2rem;
+  border-radius: 12px;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+  max-width: 400px;
+  width: 90%;
+  text-align: center;
+}
+
+.math-challenge-content h3 {
+  color: #1a1a1a;
+  margin-bottom: 15px;
+  font-weight: 600;
+}
+
+.math-challenge-content p {
+  color: #4b5563;
+  margin-bottom: 20px;
+}
+
+.math-question {
+  font-size: 1.5rem;
+  margin: 1.5rem 0;
+  padding: 1rem;
+  background: #f8f9fa;
+  border-radius: 8px;
+  border: 2px solid #e9ecef;
+  color: #1a1a1a;
+  font-weight: 600;
+}
+
+.math-challenge-buttons {
+  display: flex;
+  gap: 1rem;
+  margin-top: 1.5rem;
+}
+
+.submit-challenge-btn {
+  flex: 1;
+  background: #28a745;
+  color: white;
+  border: none;
+  padding: 0.75rem 1.5rem;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 1rem;
+  font-weight: 600;
+  transition: all 0.3s ease;
+}
+
+.submit-challenge-btn:hover:not(:disabled) {
+  background: #218838;
+  transform: translateY(-1px);
+}
+
+.submit-challenge-btn:disabled {
+  background: #6c757d;
+  cursor: not-allowed;
+  transform: none;
+}
+
+.cancel-challenge-btn {
+  flex: 1;
+  background: #dc3545;
+  color: white;
+  border: none;
+  padding: 0.75rem 1.5rem;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 1rem;
+  font-weight: 600;
+  transition: all 0.3s ease;
+}
+
+.cancel-challenge-btn:hover:not(:disabled) {
+  background: #c82333;
+  transform: translateY(-1px);
+}
+
+.cancel-challenge-btn:disabled {
+  background: #6c757d;
+  cursor: not-allowed;
+  transform: none;
 }
 
 /* Spinner */
@@ -327,8 +442,17 @@
     grid-template-columns: repeat(2, 1fr);
   }
   
-  .payment-instructions-simple {
+  .payment-instructions {
     padding: 15px;
+  }
+  
+  .math-challenge-content {
+    margin: 1rem;
+    padding: 1.5rem;
+  }
+  
+  .math-challenge-buttons {
+    flex-direction: column;
   }
 }
 
@@ -345,7 +469,78 @@
   color: #1a1a1a;
 }
 
-.payment-instructions-simple,
-.payment-instructions-simple li {
-  color: #374151;
+
+/* Input field specific styles */
+.amount-input,
+.trx-input,
+.math-input {
+  color: #1a1a1a !important;
+  font-weight: 500 !important;
+}
+
+.amount-input::placeholder,
+.trx-input::placeholder,
+.math-input::placeholder {
+  color: #6b7280 !important;
+  font-weight: normal !important;
+}
+
+/* Invalid transaction ID styling */
+.trx-input:invalid {
+  border-color: #dc3545 !important;
+  color: #dc3545 !important;
+}
+
+/* Math input specific styling */
+.math-input {
+  text-align: center;
+  font-size: 18px;
+  font-weight: 600 !important;
+}
+
+/* Button disabled state improvements */
+.add-balance-btn:disabled {
+  background: #9ca3af !important;
+  color: #6b7280 !important;
+  cursor: not-allowed !important;
+}
+
+/* Quick amount button improvements */
+.quick-amount-btn {
+  font-weight: 600;
+}
+
+.quick-amount-btn.selected {
+  background: #E2136E;
+  color: white;
+}
+
+/*  */
+
+/* AddFund.css - Loading Spinner */
+.add-fund-container .loading-spinner {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  height: 300px;
+  background: white;
+  border-radius: 16px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+}
+
+.add-fund-container .loading-spinner .spinner {
+  width: 40px;
+  height: 40px;
+  border: 4px solid #f3f3f3;
+  border-top: 4px solid #E2136E;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+  margin-bottom: 15px;
+}
+
+.add-fund-container .loading-spinner p {
+  color: #666;
+  font-size: 16px;
+  font-weight: 500;
 }

@@ -88,3 +88,99 @@
     height: auto;
   }
 }
+
+/* Sidebar.css - New Styles */
+.sidebar-header p {
+  font-size: 0.8rem;
+  color: #888;
+  margin-top: 5px;
+}
+
+.notification-badge {
+  background: #ff4757;
+  color: white;
+  border-radius: 10px;
+  padding: 2px 8px;
+  font-size: 0.7rem;
+  margin-left: auto;
+}
+
+.footer-stats {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.stat-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 5px 0;
+}
+
+.stat-label {
+  font-size: 0.8rem;
+  color: #888;
+}
+
+.stat-value {
+  font-weight: bold;
+  font-size: 0.9rem;
+}
+
+.stat-value.warning {
+  color: #ffa502;
+}
+
+/* Dashboard.css - New Styles */
+.users-overview-section {
+  background: white;
+  border-radius: 12px;
+  padding: 24px;
+  margin: 20px 0;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+}
+
+.users-table {
+  margin-top: 16px;
+}
+
+.user-email-cell {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.balance-cell {
+  font-weight: 600;
+}
+
+.balance-cell.available {
+  color: #10b981;
+}
+
+.balance-cell.pending {
+  color: #f59e0b;
+}
+
+.balance-cell.total-added {
+  color: #3b82f6;
+}
+
+.balance-cell.total-spent {
+  color: #ef4444;
+}
+
+.refresh-btn {
+  background: #3b82f6;
+  color: white;
+  border: none;
+  padding: 8px 16px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 0.9rem;
+}
+
+.refresh-btn:hover {
+  background: #2563eb;
+}

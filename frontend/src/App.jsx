@@ -1,4 +1,4 @@
-// App.jsx - GameDetails route গুলো সরিয়ে দিন
+// App.jsx - Fixed version
 import { BrowserRouter as Router, Routes, Route, useLocation, Navigate } from "react-router-dom";
 import { useEffect, useState } from "react";
 import { onAuthStateChanged } from "firebase/auth";
@@ -16,76 +16,24 @@ import Login from "./Auth/Login";
 import Dashboard from "./components/Dashboard/Dashboard";
 import ForgotPassword from "./Auth/ForgotPassword";
 import AdminDashboard from "./components/Admin/AdminDashboard";
-import { isAdminUser } from "./Utils/Admin"; // ✅ CORRECTED IMPORT
+import { isAdminUser } from "./Utils/Admin";
 import GameDetailsUser from "./components/GameShop/GameDetailsUser";
 
-// Protected Route Component
-const ProtectedRoute = ({ children }) => {
-  const [user, setUser] = useState(null);
-  const [loading, setLoading] = useState(true);
+// ✅ Loading Component - UPDATED
+const LoadingSpinner = () => (
+  <div className="loading-spinner">
+    <div className="loading-content">
+      <div className="spinner"></div>
+      <p>Loading...</p>
+    </div>
+  </div>
+);
 
-  useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, (user) => {
-      setUser(user);
-      setLoading(false);
-    });
-
-    return () => unsubscribe();
-  }, []);
-
-  if (loading) {
-    return <div className="loading">Loading...</div>;
-  }
-
-  return user ? children : <Navigate to="/profile/login" />;
-};
-
-// Public Route Component (redirect if already logged in)
-const PublicRoute = ({ children }) => {
-  const [user, setUser] = useState(null);
-  const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, (user) => {
-      setUser(user);
-      setLoading(false);
-    });
-
-    return () => unsubscribe();
-  }, []);
-
-  if (loading) {
-    return <div className="loading">Loading...</div>;
-  }
-
-  return !user ? children : <Navigate to="/" />;
-};
-
-// ✅ Admin Route Component
-const AdminRoute = ({ children }) => {
-  const [user, setUser] = useState(null);
-  const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
-      setUser(currentUser);
-      setLoading(false);
-    });
-
-    return () => unsubscribe();
-  }, []);
-
-  if (loading) {
-    return <div className="loading">Loading...</div>;
-  }
-
-  const isAdmin = user && isAdminUser(user);
-  return isAdmin ? children : <Navigate to="/" />;
-};
-
+// ✅ Main App Content Component
 function AppContent() {
   const location = useLocation();
   const [user, setUser] = useState(null);
+  const [authChecked, setAuthChecked] = useState(false);
   
   const isDashboard = location.pathname === "/dashboard" || location.pathname === "/profile/dashboard";
   const isAdminDashboard = location.pathname === "/admin/dashboard";
@@ -93,72 +41,72 @@ function AppContent() {
   const isAuthPage = location.pathname === "/profile/login" || 
                     location.pathname === "/profile/register" || 
                     location.pathname === "/forgot-password";
+  const isGameDetails = location.pathname.startsWith("/game/");
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (user) => {
       console.log('🔐 Auth State Changed - User:', user?.email);
       console.log('📍 Current Path:', location.pathname);
       setUser(user);
+      setAuthChecked(true);
     });
 
     return () => unsubscribe();
   }, [location.pathname]);
 
+  // ✅ যদি auth check না হয়ে থাকে, loading show করবে
+  if (!authChecked) {
+    return <LoadingSpinner />;
+  }
+
   return (
     <div className="app">
       {!isAuthPage && !isAdminDashboard && <Navbar user={user} />}
-      {!isCheckoutPage && !isDashboard && !isAuthPage && !isAdminDashboard && <Carousel />}
+      {!isCheckoutPage && !isDashboard && !isAuthPage && !isAdminDashboard && !isGameDetails && <Carousel />}
       
       <Routes>
+        {/* Public Routes */}
         <Route path="/" element={<Home />} />
         <Route path="/games" element={<GameShop />} />
-        {/* GameDetailsUser route */}
         <Route path="/game/:id" element={<GameDetailsUser />} />
-        
-        {/* ✅ Checkout Routes */}
-        <Route path="/checkout/:id" element={
-          <ProtectedRoute>
-            <Checkout />
-          </ProtectedRoute>
-        } />
-        
-        <Route path="/profile/dashboard" element={
-          <ProtectedRoute>
-            <Dashboard />
-          </ProtectedRoute>
-        } />
-        
-        {/* ✅ Admin Routes */}
-        <Route path="/admin/dashboard/*" element={
-          <AdminRoute>
-            <AdminDashboard />
-          </AdminRoute>
-        } />
         
         {/* Auth Routes */}
         <Route path="/profile/login" element={
-          <PublicRoute>
-            <Login />
-          </PublicRoute>
+          !user ? <Login /> : <Navigate to="/" replace />
         } />
         
         <Route path="/profile/register" element={
-          <PublicRoute>
-            <Register />
-          </PublicRoute>
+          !user ? <Register /> : <Navigate to="/" replace />
         } />
 
         <Route path="/forgot-password" element={
-          <PublicRoute>
-            <ForgotPassword />
-          </PublicRoute>
+          !user ? <ForgotPassword /> : <Navigate to="/" replace />
         } />
 
-        <Route path="*" element={<Navigate to="/" />} />
+        {/* Protected Routes */}
+        <Route path="/checkout/:id" element={
+          user ? <Checkout user={user} /> : <Navigate to="/profile/login" replace />
+        } />
+        
+        <Route path="/profile/dashboard" element={
+          user ? <Dashboard /> : <Navigate to="/profile/login" replace />
+        } />
+
+        <Route path="/dashboard" element={
+          user ? <Navigate to="/profile/dashboard" replace /> : <Navigate to="/profile/login" replace />
+        } />
+        
+        {/* Admin Routes */}
+        <Route path="/admin/dashboard/*" element={
+          user && isAdminUser(user) ? <AdminDashboard /> : <Navigate to="/" replace />
+        } />
+
+        {/* ✅ Catch all route - 404 handling */}
+        <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
       
       <NavMenu user={user}/>
-      {!isAuthPage && !isDashboard && !isAdminDashboard && <Footer />}
+      {!isAuthPage && !isDashboard && !isAdminDashboard && !isGameDetails && <Footer />}
     </div>
   );
 }

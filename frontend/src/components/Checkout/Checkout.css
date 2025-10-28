@@ -1015,3 +1015,243 @@
     font-size: 1.2rem;
   }
 }
+
+/* Checkout.css এ add করুন */
+.user-balance-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 10px;
+  padding: 10px 0;
+  border-top: 1px solid #e2e8f0;
+}
+
+.user-info {
+  font-size: 14px;
+  color: #4a5568;
+}
+
+.header-balance {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: rgba(102, 126, 234, 0.1);
+  padding: 8px 16px;
+  border-radius: 20px;
+  border: 1px solid rgba(102, 126, 234, 0.2);
+  font-weight: 600;
+  color: #667eea;
+}
+
+.balance-amount.sufficient {
+  color: #38a169;
+  font-weight: bold;
+}
+
+.balance-amount.insufficient {
+  color: #e53e3e;
+  font-weight: bold;
+}
+
+.summary-item.balance-info {
+  background: #f7fafc;
+  padding: 12px;
+  border-radius: 8px;
+  border-left: 4px solid #667eea;
+}
+
+.summary-item.remaining-balance {
+  background: #f0fff4;
+  padding: 12px;
+  border-radius: 8px;
+  border-left: 4px solid #38a169;
+  color: #2d3748;
+  font-weight: 600;
+}
+
+/* Loading states */
+.payment-btn.disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+/* Checkout.css এ add করুন */
+.confirmation-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.7);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+  padding: 20px;
+}
+
+.confirmation-popup {
+  background: white;
+  border-radius: 12px;
+  padding: 24px;
+  max-width: 500px;
+  width: 100%;
+  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+  animation: popupSlideIn 0.3s ease-out;
+}
+
+@keyframes popupSlideIn {
+  from {
+    opacity: 0;
+    transform: translateY(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.popup-header {
+  text-align: center;
+  margin-bottom: 20px;
+  border-bottom: 1px solid #e2e8f0;
+  padding-bottom: 16px;
+}
+
+.popup-header h3 {
+  color: #2d3748;
+  margin-bottom: 8px;
+  font-size: 1.5rem;
+}
+
+.popup-header p {
+  color: #718096;
+  font-size: 0.9rem;
+}
+
+.popup-content {
+  margin-bottom: 24px;
+}
+
+.order-details {
+  /* background: #f7fafc; */
+  padding: 16px;
+  border-radius: 8px;
+  margin-bottom: 16px;
+  color: #000;
+}
+
+.detail-item {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 8px;
+  padding-bottom: 8px;
+  border-bottom: 1px solid #e2e8f0;
+}
+
+.detail-item:last-child {
+  border-bottom: none;
+  margin-bottom: 0;
+}
+
+.detail-item .total-amount {
+  font-weight: bold;
+  color: #667eea;
+  font-size: 1.1rem;
+}
+
+.detail-item .new-balance {
+  font-weight: bold;
+  color: #38a169;
+}
+
+.game-details {
+  background: #fff5f5;
+  padding: 12px;
+  border-radius: 6px;
+  margin-bottom: 16px;
+  border-left: 4px solid #f56565;
+}
+
+.game-details h4 {
+  margin-bottom: 8px;
+  color: #742a2a;
+}
+
+.game-details p {
+  margin: 4px 0;
+  font-size: 0.9rem;
+}
+
+.confirmation-input {
+  margin-top: 16px;
+}
+
+.confirmation-input label {
+  display: block;
+  margin-bottom: 8px;
+  font-weight: 600;
+  color: #2d3748;
+}
+
+.confirmation-text-input {
+  width: 100%;
+  padding: 12px;
+  border: 2px solid #e2e8f0;
+  border-radius: 8px;
+  font-size: 1rem;
+  transition: border-color 0.3s ease;
+  color: black;
+}
+
+.confirmation-text-input:focus {
+  outline: none;
+  border-color: #667eea;
+}
+
+.popup-actions {
+  display: flex;
+  gap: 12px;
+  justify-content: flex-end;
+}
+
+.cancel-btn {
+  padding: 12px 24px;
+  border: 1px solid #e2e8f0;
+  background: white;
+  color: #4a5568;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: 600;
+  transition: all 0.3s ease;
+}
+
+.cancel-btn:hover:not(:disabled) {
+  background: #f7fafc;
+  border-color: #cbd5e0;
+}
+
+.confirm-btn {
+  padding: 12px 24px;
+  background: #667eea;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: 600;
+  transition: background 0.3s ease;
+}
+
+.confirm-btn:hover:not(:disabled) {
+  background: #5a67d8;
+}
+
+.confirm-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.cancel-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}

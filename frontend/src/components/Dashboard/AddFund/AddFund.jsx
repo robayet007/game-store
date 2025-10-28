@@ -1,24 +1,84 @@
-import React, { useState } from 'react';
-import { DollarSign, Plus, Clock, CheckCircle } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
+import { DollarSign, Plus, Clock, CheckCircle, X } from 'lucide-react';
+import { auth } from '../../../firebaseConfig';
 import './AddFund.css';
 
-const AddFund = ({ currentBalance, onBalanceUpdate }) => {
+const AddFund = ({ 
+  currentBalance, 
+  pendingBalance, 
+  userBkashNumber, 
+  onAddPendingBalance,
+  onBalanceUpdate
+}) => {
   const [addAmount, setAddAmount] = useState('');
+  const [transactionId, setTransactionId] = useState('');
+  const [senderNumber, setSenderNumber] = useState('');
   const [paymentLoading, setPaymentLoading] = useState(false);
   const [paymentError, setPaymentError] = useState('');
-  
-  // Pending balance state
-  const [pendingBalance, setPendingBalance] = useState(0);
-  // Success message state
   const [successMessage, setSuccessMessage] = useState('');
+  const [user, setUser] = useState(null);
+
+  // Math challenge state
+  const [showMathChallenge, setShowMathChallenge] = useState(false);
+  const [mathQuestion, setMathQuestion] = useState('');
+  const [mathAnswer, setMathAnswer] = useState('');
+  const [userMathAnswer, setUserMathAnswer] = useState('');
 
   // Quick amount buttons
   const quickAmounts = [1000, 2000, 3000, 5000, 10000];
+
+  // Get current user from Firebase
+  useEffect(() => {
+    const unsubscribe = auth.onAuthStateChanged((currentUser) => {
+      if (currentUser) {
+        setUser(currentUser);
+        console.log('🔥 Firebase User in AddFund:', currentUser.email);
+      } else {
+        setUser(null);
+      }
+    });
+
+    return () => unsubscribe();
+  }, []);
+
+  // Generate random math question
+  const generateMathQuestion = () => {
+    const num1 = Math.floor(Math.random() * 10) + 1;
+    const num2 = Math.floor(Math.random() * 10) + 1;
+    const question = `${num1} + ${num2} = ?`;
+    const answer = (num1 + num2).toString();
+    
+    setMathQuestion(question);
+    setMathAnswer(answer);
+    setUserMathAnswer('');
+    return { question, answer };
+  };
+
+  // Validate transaction ID
+  const validateTransactionId = (trxId) => {
+    if (!trxId.trim()) return false;
+    const trimmedTrx = trxId.trim().toUpperCase();
+    const trxRegex = /^[A-Z][A-Z0-9]{5,}$/;
+    return trxRegex.test(trimmedTrx);
+  };
+
+  // Validate phone number
+  const validatePhoneNumber = (phone) => {
+    if (!phone.trim()) return false;
+    const phoneRegex = /^(?:\+88|01)?(?:\d{11}|\d{13})$/;
+    return phoneRegex.test(phone.replace(/\s+/g, ''));
+  };
 
   // Handle balance add request
   const handleAddBalance = async (e) => {
     e.preventDefault();
     
+    // Check if user is logged in
+    if (!user) {
+      setPaymentError('দয়া করে প্রথমে লগইন করুন!');
+      return;
+    }
+
     const amount = parseFloat(addAmount);
     
     if (isNaN(amount) || amount <= 0) {
@@ -31,63 +91,110 @@ const AddFund = ({ currentBalance, onBalanceUpdate }) => {
       return;
     }
 
+    if (!transactionId.trim()) {
+      setPaymentError('দয়া করে bKash ট্রানজেকশন আইডি দিন!');
+      return;
+    }
+
+    if (!senderNumber.trim()) {
+      setPaymentError('দয়া করে আপনার bKash নম্বর দিন!');
+      return;
+    }
+
+    // Validate transaction ID
+    if (!validateTransactionId(transactionId)) {
+      setPaymentError('ট্রানজেকশন আইডি সঠিক নয়! সঠিক ট্রানজেকশন আইডি দিন (সাধারণত C দিয়ে শুরু)');
+      return;
+    }
+
+    // Validate phone number
+    if (!validatePhoneNumber(senderNumber)) {
+      setPaymentError('bKash নম্বর সঠিক নয়! 11 ডিজিটের নম্বর দিন (যেমন: 01712345678)');
+      return;
+    }
+
+    // Generate math challenge
+    generateMathQuestion();
+    setShowMathChallenge(true);
+  };
+
+  // Handle math challenge submission - BACKEND API CALL
+  const handleMathChallengeSubmit = async () => {
+    if (!userMathAnswer.trim()) {
+      setPaymentError('দয়া করে গাণিতিক প্রশ্নের উত্তর দিন!');
+      return;
+    }
+
+    if (userMathAnswer !== mathAnswer) {
+      setPaymentError(`গাণিতিক প্রশ্নের উত্তর ভুল হয়েছে! সঠিক উত্তর: ${mathAnswer}`);
+      setUserMathAnswer('');
+      return;
+    }
+
     setPaymentLoading(true);
     setPaymentError('');
     setSuccessMessage('');
 
     try {
-      // Generate transaction ID
-      const transactionId = 'TXN' + Date.now() + Math.random().toString(36).substr(2, 9).toUpperCase();
+      const amount = parseFloat(addAmount);
       
-      // Add to pending balance immediately
-      setPendingBalance(prev => prev + amount);
-      
-      // Send to backend - তোমার backend API call এখানে হবে
-      await sendToBackend(amount, transactionId);
-      
-      // Success message show করবে
-      setSuccessMessage(`৳ ${amount} পেন্ডিং ব্যালেন্সে যোগ হয়েছে! কিছুক্ষণের মধ্যে কনফার্ম হবে।`);
+      // Prepare payment data with user info
+      const paymentData = {
+        amount: amount,
+        transactionId: transactionId.toUpperCase().trim(),
+        senderNumber: senderNumber.trim(),
+        userBkashNumber: userBkashNumber || '01766325020',
+        user: {
+          uid: user.uid,
+          email: user.email,
+          displayName: user.displayName,
+          phoneNumber: user.phoneNumber
+        },
+        mathQuestion: mathQuestion,
+        mathAnswer: mathAnswer,
+        userMathAnswer: userMathAnswer
+      };
+
+      console.log('💰 Payment Request Details:', paymentData);
+
+      // ✅ BACKEND API CALL - MongoDB-তে data save করবে
+      const response = await fetch('http://localhost:5000/api/payments/create', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(paymentData)
+      });
+
+      const result = await response.json();
+
+      if (!response.ok || !result.success) {
+        throw new Error(result.message || 'পেমেন্ট সাবমিট করতে সমস্যা হয়েছে');
+      }
+
+      console.log('✅ Backend Response:', result);
+
+      // ✅ Parent component-কে inform করো payment successful হয়েছে
+      if (onAddPendingBalance) {
+        onAddPendingBalance(paymentData);
+      }
+
+      // Success message
+      setSuccessMessage(`৳ ${amount.toLocaleString()} পেন্ডিং ব্যালেন্সে যোগ হয়েছে! অ্যাডমিন ভেরিফাই করার পর এভেইলেবল হবে।`);
       
       // Reset form
       setAddAmount('');
+      setTransactionId('');
+      setSenderNumber('');
+      setUserMathAnswer('');
+      setShowMathChallenge(false);
       
     } catch (error) {
-      console.error('Payment error:', error);
-      setPaymentError('পেমেন্ট শুরু করতে সমস্যা হয়েছে। আবার চেষ্টা করুন।');
-      // Remove from pending balance if failed
-      setPendingBalance(prev => prev - amount);
+      console.error('❌ Payment error:', error);
+      setPaymentError(error.message || 'পেমেন্ট সাবমিট করতে সমস্যা হয়েছে। আবার চেষ্টা করুন।');
     } finally {
       setPaymentLoading(false);
     }
-  };
-
-  // Backend এ data send করার function
-  const sendToBackend = async (amount, transactionId) => {
-    // এখানে তোমার actual backend API call হবে
-    // নিচেরটা example:
-    
-    const paymentData = {
-      amount: amount,
-      transactionId: transactionId,
-      userId: 'current-user-id', // তোমার user ID
-      paymentMethod: 'bkash',
-      status: 'pending'
-    };
-
-    // Example fetch call - তোমার API endpoint দিয়ে replace করবে
-    const response = await fetch('/api/payments/create', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify(paymentData)
-    });
-
-    if (!response.ok) {
-      throw new Error('Backend error');
-    }
-
-    return await response.json();
   };
 
   // Handle quick amount selection
@@ -97,8 +204,30 @@ const AddFund = ({ currentBalance, onBalanceUpdate }) => {
     setSuccessMessage('');
   };
 
+  // ✅ যদি user না থাকে, loading show করবে
+  if (!user) {
+    return (
+      <div className="add-fund-container">
+        <div className="loading-spinner">
+          <div className="spinner"></div>
+          <p>লোড হচ্ছে...</p>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="add-fund-container">
+      {/* User Info Display */}
+      {user && (
+        <div className="user-info-card">
+          <div className="user-info">
+            <strong>ইউজার:</strong> {user.email}
+            {user.displayName && <span> | {user.displayName}</span>}
+          </div>
+        </div>
+      )}
+
       {/* Balance Cards */}
       <div className="balance-cards">
         {/* Available Balance Card */}
@@ -107,7 +236,8 @@ const AddFund = ({ currentBalance, onBalanceUpdate }) => {
             <DollarSign size={24} className="balance-icon" />
             <div className="balance-info">
               <h4>এভেইলেবল ব্যালেন্স</h4>
-              <div className="balance-amount">৳ {currentBalance.toFixed(2)}</div>
+              {/* ✅ Dashboard থেকে আসা current balance */}
+              <div className="balance-amount">৳ {currentBalance?.toFixed(2) || '0.00'}</div>
             </div>
           </div>
           <p className="balance-note">
@@ -121,14 +251,69 @@ const AddFund = ({ currentBalance, onBalanceUpdate }) => {
             <Clock size={24} className="balance-icon" />
             <div className="balance-info">
               <h4>পেন্ডিং ব্যালেন্স</h4>
-              <div className="balance-amount">৳ {pendingBalance.toFixed(2)}</div>
+              {/* ✅ Dashboard থেকে আসা pending balance */}
+              <div className="balance-amount">৳ {pendingBalance?.toFixed(2) || '0.00'}</div>
             </div>
           </div>
           <p className="balance-note">
-            কিছুক্ষণের মধ্যে কনফার্ম হয়ে এভেইলেবল হবে
+            অ্যাডমিন ভেরিফাই করার পর এভেইলেবল হবে
           </p>
         </div>
       </div>
+
+      {/* Rest of your component remains the same */}
+      {/* Math Challenge Modal */}
+      {showMathChallenge && (
+        <div className="math-challenge-modal">
+          <div className="math-challenge-content">
+            <h3>সিকিউরিটি ভেরিফিকেশন</h3>
+            <p>নিচের গাণিতিক প্রশ্নের উত্তর দিন:</p>
+            
+            <div className="math-question">
+              <strong>{mathQuestion}</strong>
+            </div>
+            
+            <div className="form-group">
+              <input
+                type="text"
+                placeholder="উত্তর লিখুন (সংখ্যা)"
+                value={userMathAnswer}
+                onChange={(e) => setUserMathAnswer(e.target.value.replace(/[^0-9]/g, ''))}
+                disabled={paymentLoading}
+                className="math-input"
+              />
+            </div>
+
+            <div className="math-challenge-buttons">
+              <button
+                onClick={handleMathChallengeSubmit}
+                disabled={paymentLoading || !userMathAnswer}
+                className="submit-challenge-btn"
+              >
+                {paymentLoading ? (
+                  <>
+                    <div className="spinner"></div>
+                    প্রসেসিং...
+                  </>
+                ) : (
+                  'ভেরিফাই করুন'
+                )}
+              </button>
+              
+              <button
+                onClick={() => {
+                  setShowMathChallenge(false);
+                  setUserMathAnswer('');
+                }}
+                className="cancel-challenge-btn"
+                disabled={paymentLoading}
+              >
+                বাতিল
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Add Balance Form */}
       <div className="add-balance-section">
@@ -183,14 +368,67 @@ const AddFund = ({ currentBalance, onBalanceUpdate }) => {
               step="100"
               required
               disabled={paymentLoading}
+              className="amount-input"
             />
             <small>ন্যূনতম ১০০০ টাকা যোগ করতে হবে</small>
+          </div>
+
+          <div className="form-group">
+            <label>আপনার bKash নম্বর</label>
+            <input 
+              type="tel" 
+              placeholder="আপনার bKash নম্বর (যেমন: 01712345678)"
+              value={senderNumber}
+              onChange={(e) => {
+                setSenderNumber(e.target.value);
+                setPaymentError('');
+                setSuccessMessage('');
+              }}
+              required
+              disabled={paymentLoading}
+              className="phone-input"
+              style={{
+                borderColor: senderNumber && !validatePhoneNumber(senderNumber) ? '#dc3545' : '#d1d5db',
+                color: senderNumber && !validatePhoneNumber(senderNumber) ? '#dc3545' : '#1a1a1a'
+              }}
+            />
+            <small>
+              {senderNumber && !validatePhoneNumber(senderNumber) 
+                ? '⚠️ bKash নম্বর সঠিক নয় (11 ডিজিটের নম্বর দিন)' 
+                : 'আপনার bKash নম্বর যেখান থেকে টাকা পাঠাবেন'}
+            </small>
+          </div>
+
+          <div className="form-group">
+            <label>bKash ট্রানজেকশন আইডি</label>
+            <input 
+              type="text" 
+              placeholder="bKash Trx ID (যেমন: C6A8B9X2)"
+              value={transactionId}
+              onChange={(e) => {
+                setTransactionId(e.target.value);
+                setPaymentError('');
+                setSuccessMessage('');
+              }}
+              required
+              disabled={paymentLoading}
+              className="trx-input"
+              style={{
+                borderColor: transactionId && !validateTransactionId(transactionId) ? '#dc3545' : '#d1d5db',
+                color: transactionId && !validateTransactionId(transactionId) ? '#dc3545' : '#1a1a1a'
+              }}
+            />
+            <small>
+              {transactionId && !validateTransactionId(transactionId) 
+                ? '⚠️ ট্রানজেকশন আইডি সঠিক নয় (সাধারণত C দিয়ে শুরু হয়)' 
+                : 'Money Send করার পর যে Trx ID পাবেন (যেমন: C6A8B9X2)'}
+            </small>
           </div>
           
           <button 
             type="submit" 
             className="add-balance-btn"
-            disabled={paymentLoading || !addAmount || parseFloat(addAmount) < 1000}
+            disabled={paymentLoading || !addAmount || !transactionId || !senderNumber || parseFloat(addAmount) < 1000 || !validateTransactionId(transactionId) || !validatePhoneNumber(senderNumber)}
           >
             {paymentLoading ? (
               <>
@@ -207,15 +445,27 @@ const AddFund = ({ currentBalance, onBalanceUpdate }) => {
         </form>
 
         {/* Payment Instructions */}
-        <div className="payment-instructions-simple">
+        <div className="payment-instructions">
           <h5>পেমেন্ট নির্দেশনা:</h5>
           <ol>
-            <li>উপরে অ্যামাউন্ট সিলেক্ট করে "যোগ করুন" বাটনে ক্লিক করুন</li>
-            <li>অটোমেটিকভাবে পেন্ডিং ব্যালেন্সে যোগ হবে</li>
-            <li>bKash: <strong>01XXXXXXXXX</strong> নম্বরে মানি সেন্ড করুন</li>
-            <li>রেফারেন্স হিসেবে আপনার ইউজার আইডি দিন</li>
-            <li>কিছুক্ষণের মধ্যে ব্যালেন্স কনফার্ম হবে</li>
+            <li>উপরে অ্যামাউন্ট সিলেক্ট করুন</li>
+            <li><strong>bKash App এ গিয়ে 01766325020 নম্বরে মানি সেন্ড করুন</strong></li>
+            <li>আপনার bKash নম্বর দিন</li>
+            <li>ট্রানজেকশন আইডি কপি করে এখানে পেস্ট করুন (যেমন: C6A8B9X2)</li>
+            <li>গাণিতিক প্রশ্নের উত্তর দিন (যেমন: 8 + 8 = 16)</li>
+            <li>ভেরিফাই করুন - অ্যামাউন্ট পেন্ডিং ব্যালেন্সে যোগ হবে</li>
+            <li>অ্যাডমিন চেক করার পর ব্যালেন্স এভেইলেবল হবে</li>
           </ol>
+          
+          <div className="important-note">
+            <strong>গুরুত্বপূর্ণ:</strong> 
+            <ul>
+              <li>ট্রানজেকশন আইডি সঠিকভাবে দিন (সাধারণত C দিয়ে শুরু)</li>
+              <li>আপনার bKash নম্বর সঠিকভাবে দিন</li>
+              <li>গাণিতিক প্রশ্নের উত্তর সঠিকভাবে দিন</li>
+              <li>অ্যাডমিন ভেরিফাই করার পরই ব্যালেন্স এভেইলেবল হবে</li>
+            </ul>
+          </div>
         </div>
       </div>
     </div>

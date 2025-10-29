@@ -6,6 +6,20 @@ import { auth } from '../firebaseConfig';
 // import { isAdminUser } from '../Utils/admin';
 import "./Login.css"
 
+// ✅ Admin Users List
+const ADMIN_USERS = [
+  'admin@metagameshop.com',
+  'evolveera25@gmail.com'
+];
+
+// ✅ Admin Check Function
+const isAdminUser = (user) => {
+  if (!user || !user.email) return false;
+  return ADMIN_USERS.includes(user.email.toLowerCase());
+};
+
+// 
+
 const Login = () => {
   const [formData, setFormData] = useState({
     email: '',

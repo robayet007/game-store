@@ -13,6 +13,22 @@ import AddGameProduct from './AddGameProduct/AddGameProduct';
 import { useProducts } from '../../hooks/useProducts';
 import './AdminDashboard.css';
 
+// 
+
+// ✅ Admin Users List
+const ADMIN_USERS = [
+  'admin@metagameshop.com',
+  'evolveera25@gmail.com'
+];
+
+// ✅ Admin Check Function
+const isAdminUser = (user) => {
+  if (!user || !user.email) return false;
+  return ADMIN_USERS.includes(user.email.toLowerCase());
+};
+
+// 
+
 const AdminDashboard = () => {
   const [activeSection, setActiveSection] = useState('dashboard'); // ✅ Default to dashboard
   const [selectedCategory, setSelectedCategory] = useState('subscription');

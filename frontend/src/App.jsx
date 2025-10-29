@@ -16,10 +16,21 @@ import Login from "./Auth/Login";
 import Dashboard from "./components/Dashboard/Dashboard";
 import ForgotPassword from "./Auth/ForgotPassword";
 import AdminDashboard from "./components/Admin/AdminDashboard";
-import { isAdminUser } from "./Utils/admin";
 import GameDetailsUser from "./components/GameShop/GameDetailsUser";
 
-// ✅ Loading Component - UPDATED
+// ✅ Admin Users List
+const ADMIN_USERS = [
+  'admin@metagameshop.com',
+  'evolveera25@gmail.com'
+];
+
+// ✅ Admin Check Function
+const isAdminUser = (user) => {
+  if (!user || !user.email) return false;
+  return ADMIN_USERS.includes(user.email.toLowerCase());
+};
+
+// ✅ Loading Component
 const LoadingSpinner = () => (
   <div className="loading-spinner">
     <div className="loading-content">
@@ -54,7 +65,7 @@ function AppContent() {
     return () => unsubscribe();
   }, [location.pathname]);
 
-  // ✅ যদি auth check না হয়ে থাকে, loading show করবে
+  // ✅ যদি auth check না হয়ে থাকে, loading show করবে
   if (!authChecked) {
     return <LoadingSpinner />;
   }

@@ -5,16 +5,16 @@ export const USER_ROLES = {
   USER: 'user'
 };
 
-// ✅ আপনার email admin user হিসেবে add করুন
-export const ADMIN_USERS = [
-  'admin@metagameshop.com',
-  'evolveera25@gmail.com'  // ✅ আপনার email
-];
+// // ✅ আপনার email admin user হিসেবে add করুন
+// export const ADMIN_USERS = [
+//   'admin@metagameshop.com',
+//   'evolveera25@gmail.com'  // ✅ আপনার email
+// ];
 
-export const isAdminUser = (user) => {
-  if (!user || !user.email) return false;
-  return ADMIN_USERS.includes(user.email.toLowerCase());
-};
+// export const isAdminUser = (user) => {
+//   if (!user || !user.email) return false;
+//   return ADMIN_USERS.includes(user.email.toLowerCase());
+// };
 
 export const getUserRole = (user) => {
   if (!user) return USER_ROLES.USER;

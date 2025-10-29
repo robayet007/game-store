@@ -16,7 +16,7 @@ import Login from "./Auth/Login";
 import Dashboard from "./components/Dashboard/Dashboard";
 import ForgotPassword from "./Auth/ForgotPassword";
 import AdminDashboard from "./components/Admin/AdminDashboard";
-// import { isAdminUser } from "../src/Utils/Admin.js"; // ✅ FIXED IMPORT
+import { isAdminUser } from "./Utils/Admin.js"; // ✅ FIXED IMPORT
 import GameDetailsUser from "./components/GameShop/GameDetailsUser";
 
 // ✅ Loading Component - UPDATED
@@ -28,19 +28,6 @@ const LoadingSpinner = () => (
     </div>
   </div>
 );
-
-
-// ✅ ADD THIS FUNCTION - Line 16 এর পরে
-const ADMIN_USERS = [
-  'admin@metagameshop.com',
-  'evolveera25@gmail.com'
-];
-
-const isAdminUser = (user) => {
-  if (!user || !user.email) return false;
-  return ADMIN_USERS.includes(user.email.toLowerCase());
-};
-
 
 // ✅ Main App Content Component
 function AppContent() {

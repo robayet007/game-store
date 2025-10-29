@@ -32,14 +32,13 @@ const isAdminUser = (user) => {
 
 // ✅ Loading Component
 const LoadingSpinner = () => (
-  <div className="loading-spinner">
-    <div className="loading-content">
-      <div className="spinner"></div>
+  <div className="app-loading-spinner">
+    <div className="app-loading-content">
+      <div className="app-spinner"></div>
       <p>Loading...</p>
     </div>
   </div>
 );
-
 // ✅ Main App Content Component
 function AppContent() {
   const location = useLocation();
@@ -117,7 +116,7 @@ function AppContent() {
       </Routes>
       
       <NavMenu user={user}/>
-      {!isAuthPage && !isDashboard && !isAdminDashboard && !isGameDetails && <Footer />}
+      {!isAuthPage  && !isAdminDashboard && !isGameDetails && <Footer />}
     </div>
   );
 }

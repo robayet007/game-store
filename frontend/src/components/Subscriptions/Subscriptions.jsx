@@ -108,13 +108,9 @@ const Subscriptions = () => {
                     {product.price ? `৳ ${product.price}` : '৳ 199 - ৳ 999'}
                   </div>
                 </div>
-                <div className="card-badge">
-                  <span>Subscribe</span>
-                </div>
+                
               </div>
-              <div className="card-overlay-horizontal">
-                <span>Click to Purchase</span>
-              </div>
+              
             </div>
           ))
         )}

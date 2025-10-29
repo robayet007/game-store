@@ -1,7 +1,11 @@
+// Checkout.jsx - With Base URL
 import React, { useState, useEffect } from 'react';
 import { useParams, useLocation, useNavigate } from 'react-router-dom';
 import { Minus, Plus, Wallet } from 'lucide-react';
-import './Checkout.css';
+import styles from './Checkout.module.css';
+
+// Base URL constant
+const BASE_URL = "http://localhost:5000";
 
 const Checkout = ({ user }) => {
   const { id } = useParams();
@@ -38,7 +42,7 @@ const Checkout = ({ user }) => {
       
       try {
         setBalanceLoading(true);
-        const response = await fetch('http://localhost:5000/api/admin/users');
+        const response = await fetch(`${BASE_URL}/api/admin/users`);
         
         if (response.ok) {
           const data = await response.json();
@@ -89,7 +93,7 @@ const Checkout = ({ user }) => {
       // Method 2: From URL parameter and API call
       if (id) {
         try {
-          const response = await fetch(`http://localhost:5000/api/products/${id}`);
+          const response = await fetch(`${BASE_URL}/api/products/${id}`);
           if (response.ok) {
             const productData = await response.json();
             setSelectedItem(productData);
@@ -163,7 +167,6 @@ const Checkout = ({ user }) => {
     const totalAmount = calculateTotal();
 
     try {
-      // Step 1: Create purchase via API - This will automatically update balance
       const purchaseData = {
         userEmail: user.email,
         productName: selectedItem.title,
@@ -180,7 +183,7 @@ const Checkout = ({ user }) => {
 
       console.log('🛒 Sending purchase request:', purchaseData);
 
-      const response = await fetch('http://localhost:5000/api/purchases', {
+      const response = await fetch(`${BASE_URL}/api/purchases`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -188,7 +191,6 @@ const Checkout = ({ user }) => {
         body: JSON.stringify(purchaseData)
       });
 
-      // Check response status
       if (!response.ok) {
         const errorData = await response.json();
         throw new Error(errorData.message || `Server error: ${response.status}`);
@@ -197,7 +199,6 @@ const Checkout = ({ user }) => {
       const result = await response.json();
 
       if (result.success) {
-        // ✅ Update local state with new balance from server
         setUserBalance(result.newBalance);
         setShowConfirmation(false);
         setConfirmationText('');
@@ -215,7 +216,6 @@ const Checkout = ({ user }) => {
 
 Thank you for your purchase! 🎮`);
 
-        // Redirect to dashboard
         navigate('/profile/dashboard');
       } else {
         throw new Error(result.message || 'Failed to process purchase');
@@ -224,7 +224,6 @@ Thank you for your purchase! 🎮`);
     } catch (error) {
       console.error('❌ Error completing purchase:', error);
       
-      // Specific error messages
       if (error.message.includes('Insufficient balance')) {
         alert('❌ Insufficient Meta Balance! Please add more balance to your account.');
       } else if (error.message.includes('User balance not found')) {
@@ -247,7 +246,7 @@ Thank you for your purchase! 🎮`);
   const getImageUrl = (imgPath) => {
     if (!imgPath) return 'https://via.placeholder.com/300x200/667eea/ffffff?text=Product+Image';
     if (imgPath.startsWith('http')) return imgPath;
-    if (imgPath.startsWith('/uploads/')) return `http://localhost:5000${imgPath}`;
+    if (imgPath.startsWith('/uploads/')) return `${BASE_URL}${imgPath}`;
     return 'https://via.placeholder.com/300x200/667eea/ffffff?text=Product+Image';
   };
 
@@ -290,13 +289,13 @@ Thank you for your purchase! 🎮`);
 
   if (!user) {
     return (
-      <div className="checkout-container">
-        <div className="error-message">
+      <div className={styles.checkoutContainer}>
+        <div className={styles.errorMessage}>
           <h2>Authentication Required</h2>
           <p>Please login to continue with your purchase.</p>
           <button 
             onClick={() => navigate('/login')}
-            className="back-to-shop-btn"
+            className={styles.backToShopBtn}
           >
             Go to Login
           </button>
@@ -307,8 +306,8 @@ Thank you for your purchase! 🎮`);
 
   if (loading) {
     return (
-      <div className="checkout-container">
-        <div className="loading">
+      <div className={styles.checkoutContainer}>
+        <div className={styles.loading}>
           <p>Loading product information...</p>
         </div>
       </div>
@@ -317,13 +316,13 @@ Thank you for your purchase! 🎮`);
 
   if (!selectedItem) {
     return (
-      <div className="checkout-container">
-        <div className="error-message">
+      <div className={styles.checkoutContainer}>
+        <div className={styles.errorMessage}>
           <h2>Product Not Found</h2>
           <p>The product you're looking for is not available.</p>
           <button 
             onClick={() => navigate('/shop')}
-            className="back-to-shop-btn"
+            className={styles.backToShopBtn}
           >
             Back to Shop
           </button>
@@ -337,53 +336,62 @@ Thank you for your purchase! 🎮`);
   const hasSufficientBalance = userBalance >= totalAmount;
 
   return (
-    <div className="checkout-container">
+    <div className={styles.checkoutContainer}>
       {/* Confirmation Popup */}
       {showConfirmation && (
-        <div className="confirmation-overlay">
-          <div className="confirmation-popup">
-            <div className="popup-header">
+        <div className={styles.confirmationOverlay}>
+          <div className={styles.confirmationPopup}>
+            <div className={styles.popupHeader}>
               <h3>Confirm Your Purchase</h3>
               <p>Please review your order details</p>
             </div>
             
-            <div className="popup-content">
-              <div className="order-details">
-                <div className="detail-item">
+            <div className={styles.popupContent}>
+              <div className={styles.orderDetails} style={{
+                display: "grid",
+                background: "#1a1a2e",
+                color: "#fff",
+                gridTemplateColumns: "repeat(2, 1fr)",
+                gap: "10px",
+                padding: "1rem",
+                borderRadius: "8px",
+                border: "1px solid rgba(255, 255, 255, 0.1)"
+              }}>
+                <div className={styles.detailItem}>
                   <span>Product:</span>
                   <span>{selectedItem.title}</span>
                 </div>
-                <div className="detail-item">
+                <div className={styles.detailItem}>
                   <span>Quantity:</span>
                   <span>{quantity}</span>
                 </div>
-                <div className="detail-item">
+                <div className={styles.detailItem}>
                   <span>Unit Price:</span>
                   <span>৳ {selectedItem.price}</span>
                 </div>
-                <div className="detail-item">
+                <div className={styles.detailItem}>
                   <span>Total Amount:</span>
-                  <span className="total-amount">৳ {totalAmount}</span>
+                  <span className={styles.totalAmount}>৳ {totalAmount}</span>
                 </div>
-                <div className="detail-item">
+                <div className={styles.detailItem}>
                   <span>Current Balance:</span>
                   <span>৳ {userBalance.toFixed(2)}</span>
                 </div>
-                <div className="detail-item">
+                <div className={styles.detailItem}>
                   <span>Balance After Purchase:</span>
-                  <span className="new-balance">৳ {(userBalance - totalAmount).toFixed(2)}</span>
+                  <span className={styles.newBalance}>৳ {(userBalance - totalAmount).toFixed(2)}</span>
                 </div>
               </div>
 
               {selectedItem.category === 'game-topup' && (
-                <div className="game-details">
+                <div className={styles.gameDetails}>
                   <h4>Game Information:</h4>
                   <p><strong>UID:</strong> {formData.playerUID}</p>
                   <p><strong>Username:</strong> {formData.username}</p>
                 </div>
               )}
 
-              <div className="confirmation-input">
+              <div className={styles.confirmationInput}>
                 <label>
                   Type <strong>"yes"</strong> to confirm your purchase:
                 </label>
@@ -392,22 +400,22 @@ Thank you for your purchase! 🎮`);
                   value={confirmationText}
                   onChange={(e) => setConfirmationText(e.target.value)}
                   placeholder="Type yes here..."
-                  className="confirmation-text-input"
+                  className={styles.confirmationTextInput}
                 />
               </div>
             </div>
 
-            <div className="popup-actions">
+            <div className={styles.popupActions}>
               <button 
                 onClick={handleCancelPurchase}
-                className="cancel-btn"
+                className={styles.cancelBtn}
                 disabled={purchaseLoading}
               >
                 Cancel
               </button>
               <button 
                 onClick={handleConfirmPurchase}
-                className="confirm-btn"
+                className={styles.confirmBtn}
                 disabled={purchaseLoading || confirmationText.toLowerCase() !== 'yes'}
               >
                 {purchaseLoading ? 'Processing...' : 'Confirm Purchase'}
@@ -417,19 +425,19 @@ Thank you for your purchase! 🎮`);
         </div>
       )}
 
-      <div className="checkout-header">
-        <button onClick={() => navigate(-1)} className="back-button">
+      <div className={styles.checkoutHeader}>
+        <button onClick={() => navigate(-1)} className={styles.backButton}>
           ← Back
         </button>
-        <h1 className="checkout-title">Checkout</h1>
-        <p className="checkout-subtitle">Complete your purchase</p>
+        <h1 className={styles.checkoutTitle}>Checkout</h1>
+        <p className={styles.checkoutSubtitle}>Complete your purchase</p>
         
         {/* User Info and Balance */}
-        <div className="user-balance-header">
-          <div className="user-info">
+        <div className={styles.userBalanceHeader}>
+          <div className={styles.userInfo}>
             <span>Logged in as: {user.email}</span>
           </div>
-          <div className="header-balance">
+          <div className={styles.headerBalance}>
             <Wallet size={16} />
             <span>
               {balanceLoading ? 'Loading...' : `Meta Balance: ৳ ${userBalance.toFixed(2)}`}
@@ -437,36 +445,36 @@ Thank you for your purchase! 🎮`);
           </div>
         </div>
         
-        <div className={`category-badge ${selectedItem.category}`}>
+        <div className={`${styles.categoryBadge} ${styles[selectedItem.category]}`}>
           {selectedItem.category === 'subscription' && '👑 Subscription'}
           {selectedItem.category === 'game-topup' && '🎮 Game Top-up'}
           {selectedItem.category === 'special-offers' && '⭐ Special Offer'}
         </div>
       </div>
 
-      <div className="checkout-content">
+      <div className={styles.checkoutContent}>
         {/* Left Side - Product Details */}
-        <div className="product-details-section">
-          <h2 className="section-title">Product Details</h2>
-          <div className="selected-product-card">
-            <div className="quantity-controls-top">
+        <div className={styles.productDetailsSection}>
+          <h2 className={styles.sectionTitle}>Product Details</h2>
+          <div className={styles.selectedProductCard}>
+            <div className={styles.quantityControlsTop}>
               <button 
-                className="quantity-btn"
+                className={styles.quantityBtn}
                 onClick={() => handleQuantityChange('decrement')}
                 disabled={quantity <= 1}
               >
                 <Minus size={16} />
               </button>
-              <span className="quantity-display">{quantity}</span>
+              <span className={styles.quantityDisplay}>{quantity}</span>
               <button 
-                className="quantity-btn"
+                className={styles.quantityBtn}
                 onClick={() => handleQuantityChange('increment')}
               >
                 <Plus size={16} />
               </button>
             </div>
 
-            <div className="product-image-large">
+            <div className={styles.productImageLarge}>
               <img 
                 src={getImageUrl(selectedItem.image)} 
                 alt={selectedItem.title}
@@ -475,23 +483,23 @@ Thank you for your purchase! 🎮`);
                 }}
               />
               {selectedItem.category === 'special-offers' && (
-                <div className="special-offer-badge">
+                <div className={styles.specialOfferBadge}>
                   ⭐ Special Offer
                 </div>
               )}
             </div>
             
-            <div className="product-info-detailed">
-              <h3 className="product-title">{selectedItem.title}</h3>
+            <div className={styles.productInfoDetailed}>
+              <h3 className={styles.productTitle}>{selectedItem.title}</h3>
               
-              <div className="price-section">
-                <span className="current-price">৳ {selectedItem.price}</span>
+              <div className={styles.priceSection}>
+                <span className={styles.currentPrice}>৳ {selectedItem.price}</span>
                 {selectedItem.category === 'special-offers' && selectedItem.originalPrice && (
-                  <span className="original-price">৳ {selectedItem.originalPrice}</span>
+                  <span className={styles.originalPrice}>৳ {selectedItem.originalPrice}</span>
                 )}
               </div>
               
-              <div className="product-description">
+              <div className={styles.productDescription}>
                 <h4>Description</h4>
                 <p>{selectedItem.description || categoryConfig.description}</p>
               </div>
@@ -500,14 +508,14 @@ Thank you for your purchase! 🎮`);
         </div>
 
         {/* Right Side - Order Form */}
-        <div className="order-section">
-          <div className="order-card">
-            <h2 className="section-title">{categoryConfig.formTitle}</h2>
+        <div className={styles.orderSection}>
+          <div className={styles.orderCard}>
+            <h2 className={styles.sectionTitle}>{categoryConfig.formTitle}</h2>
             
-            <form className="purchase-form" onSubmit={handlePurchaseClick}>
+            <form className={styles.purchaseForm} onSubmit={handlePurchaseClick}>
               {categoryConfig.showGameFields && (
                 <>
-                  <div className="form-group">
+                  <div className={styles.formGroup}>
                     <label htmlFor="playerUID">Player UID / ID *</label>
                     <input
                       type="text"
@@ -520,7 +528,7 @@ Thank you for your purchase! 🎮`);
                     />
                   </div>
 
-                  <div className="form-group">
+                  <div className={styles.formGroup}>
                     <label htmlFor="username">Username *</label>
                     <input
                       type="text"
@@ -536,7 +544,7 @@ Thank you for your purchase! 🎮`);
               )}
 
               {categoryConfig.showEmail && (
-                <div className="form-group">
+                <div className={styles.formGroup}>
                   <label htmlFor="email">Email Address *</label>
                   <input
                     type="email"
@@ -552,7 +560,7 @@ Thank you for your purchase! 🎮`);
                 </div>
               )}
 
-              <div className="form-group">
+              <div className={styles.formGroup}>
                 <label htmlFor="whatsapp">WhatsApp Number *</label>
                 <input
                   type="tel"
@@ -566,21 +574,21 @@ Thank you for your purchase! 🎮`);
                 <small>We'll contact you for confirmation</small>
               </div>
 
-              <div className="order-summary">
-                <h3 className="summary-title">Order Summary</h3>
-                <div className="summary-item">
+              <div className={styles.orderSummary}>
+                <h3 className={styles.summaryTitle}>Order Summary</h3>
+                <div className={styles.summaryItem}>
                   <span>Product:</span>
                   <span>{selectedItem.title}</span>
                 </div>
-                <div className="summary-item">
+                <div className={styles.summaryItem}>
                   <span>Quantity:</span>
                   <span>{quantity}</span>
                 </div>
-                <div className="summary-item">
+                <div className={styles.summaryItem}>
                   <span>Unit Price:</span>
                   <span>৳ {selectedItem.price}</span>
                 </div>
-                <div className="summary-item">
+                <div className={styles.summaryItem}>
                   <span>Type:</span>
                   <span>
                     {selectedItem.category === 'subscription' && 'Subscription'}
@@ -590,56 +598,56 @@ Thank you for your purchase! 🎮`);
                 </div>
                 
                 {selectedItem.category === 'special-offers' && selectedItem.originalPrice && (
-                  <div className="summary-item discount">
+                  <div className={`${styles.summaryItem} ${styles.discount}`}>
                     <span>Discount:</span>
-                    <span className="discount-amount">
+                    <span className={styles.discountAmount}>
                       -৳ {selectedItem.originalPrice - selectedItem.price}
                     </span>
                   </div>
                 )}
                 
-                <div className="summary-item total">
+                <div className={`${styles.summaryItem} ${styles.total}`}>
                   <span>Total Amount:</span>
                   <span>৳ {totalAmount}</span>
                 </div>
 
                 {/* User Balance from Database */}
-                <div className="summary-item balance-info">
+                <div className={`${styles.summaryItem} ${styles.balanceInfo}`}>
                   <span>Your Meta Balance:</span>
-                  <span className={`balance-amount ${hasSufficientBalance ? 'sufficient' : 'insufficient'}`}>
+                  <span className={`${styles.balanceAmount} ${hasSufficientBalance ? styles.sufficient : styles.insufficient}`}>
                     {balanceLoading ? 'Loading...' : `৳ ${userBalance.toFixed(2)}`}
                   </span>
                 </div>
 
                 {hasSufficientBalance && !balanceLoading && (
-                  <div className="summary-item remaining-balance">
+                  <div className={`${styles.summaryItem} ${styles.remainingBalance}`}>
                     <span>Remaining Balance:</span>
                     <span>৳ {(userBalance - totalAmount).toFixed(2)}</span>
                   </div>
                 )}
               </div>
 
-              <div className="payment-buttons-section">
+              <div className={styles.paymentButtonsSection}>
                 <button 
                   type="submit"
-                  className={`payment-btn meta ${hasSufficientBalance && !balanceLoading ? '' : 'disabled'}`}
+                  className={`${styles.paymentBtn} ${styles.meta} ${hasSufficientBalance && !balanceLoading ? '' : styles.disabled}`}
                   disabled={!hasSufficientBalance || balanceLoading}
                 >
                   <Wallet size={18} />
-                  <div className="meta-pay-content">
+                  <div className={styles.metaPayContent}>
                     <span>Pay with Meta - ৳ {totalAmount}</span>
-                    <span className="meta-balance">
+                    <span className={styles.metaBalance}>
                       {balanceLoading ? 'Loading balance...' : `Available: ৳ ${userBalance.toFixed(2)}`}
                     </span>
                   </div>
                 </button>
 
                 {!hasSufficientBalance && !balanceLoading && (
-                  <div className="insufficient-balance-message">
+                  <div className={styles.insufficientBalanceMessage}>
                     <p>❌ Insufficient Meta Balance</p>
                     <button 
                       type="button"
-                      className="add-balance-btn"
+                      className={styles.addBalanceBtn}
                       onClick={() => navigate('/profile/dashboard')}
                     >
                       Add Balance to Your Account
@@ -648,7 +656,7 @@ Thank you for your purchase! 🎮`);
                 )}
               </div>
 
-              <div className="security-notice">
+              <div className={styles.securityNotice}>
                 <p>🔒 Your payment is secure and encrypted</p>
               </div>
             </form>

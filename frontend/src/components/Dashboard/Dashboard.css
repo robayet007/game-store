@@ -9,7 +9,7 @@
 
 /* Header Styles */
 .dashboard-header {
-  background: #1b1b1b;
+  background: #0a0a0a !important; /* ✅ Changed to blackish */
   backdrop-filter: blur(10px);
   border-bottom: 1px solid rgba(102, 126, 234, 0.3);
   padding: 1rem 2rem;
@@ -106,7 +106,7 @@
 }
 
 .sidebar-nav {
-  background: rgba(20, 20, 20, 0.95);
+  background: #0f0f0f; /* ✅ Changed to blackish */
   backdrop-filter: blur(10px);
   border-radius: 20px;
   padding: 1.5rem;
@@ -158,7 +158,7 @@
 /* Main Content Styles */
 .dashboard-main {
   flex: 1;
-  background: rgba(20, 20, 20, 0.95);
+  background: #0f0f0f; /* ✅ Changed to blackish */
   backdrop-filter: blur(10px);
   border-radius: 20px;
   padding: 2rem;
@@ -194,7 +194,7 @@
 }
 
 .profile-card {
-  background: rgba(30, 30, 30, 0.8);
+  background: #0f0f0f; /* ✅ Changed to blackish */
   border-radius: 20px;
   padding: 2rem;
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
@@ -257,13 +257,13 @@
   align-items: center;
   gap: 15px;
   padding: 1rem;
-  background: rgba(40, 40, 40, 0.6);
+  background: #1a1a1a; /* ✅ Changed to blackish */
   border-radius: 12px;
   transition: all 0.3s ease;
 }
 
 .detail-item:hover {
-  background: rgba(50, 50, 50, 0.8);
+  background: #222222; /* ✅ Changed to slightly lighter blackish */
   transform: translateY(-2px);
 }
 
@@ -340,7 +340,7 @@
 }
 
 .stat-card {
-  background: rgba(30, 30, 30, 0.8);
+  background: #0a0a0a !important; /* ✅ Changed to blackish */
   padding: 1.5rem;
   border-radius: 16px;
   text-align: center;
@@ -352,6 +352,7 @@
 .stat-card:hover {
   transform: translateY(-5px);
   box-shadow: 0 8px 25px rgba(102, 126, 234, 0.3);
+  background: #0f0f0f; /* ✅ Slightly lighter on hover */
 }
 
 .stat-number {
@@ -376,7 +377,7 @@
 }
 
 .order-card {
-  background: rgba(30, 30, 30, 0.8);
+  background: #0f0f0f; /* ✅ Changed to blackish */
   border-radius: 16px;
   padding: 1.5rem;
   box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
@@ -447,7 +448,7 @@
   align-items: center;
   margin-bottom: 1rem;
   padding: 1rem;
-  background: rgba(40, 40, 40, 0.6);
+  background: #1a1a1a; /* ✅ Changed to blackish */
   border-radius: 12px;
 }
 
@@ -507,7 +508,7 @@
 
 /* Game Information */
 .game-info {
-  background: rgba(40, 40, 40, 0.6);
+  background: #1a1a1a; /* ✅ Changed to blackish */
   padding: 1rem;
   border-radius: 12px;
   margin-bottom: 1rem;
@@ -556,7 +557,7 @@
 
 .order-category {
   padding: 0.25rem 0.75rem;
-  background: rgba(40, 40, 40, 0.6);
+  background: #1a1a1a; /* ✅ Changed to blackish */
   border-radius: 8px;
   font-size: 0.7rem;
   font-weight: 600;
@@ -660,7 +661,7 @@
 }
 
 .change-password {
-  background: rgba(30, 30, 30, 0.8);
+  background: #0f0f0f; /* ✅ Changed to blackish */
   padding: 2rem;
   border-radius: 16px;
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
@@ -689,7 +690,7 @@
   border-radius: 8px;
   font-size: 1rem;
   transition: all 0.3s ease;
-  background: rgba(30, 30, 30, 0.6);
+  background: #1a1a1a; /* ✅ Changed to blackish */
   color: #e0e0e0;
 }
 
@@ -700,7 +701,7 @@
 }
 
 .form-group input:disabled {
-  background: rgba(40, 40, 40, 0.4);
+  background: #0f0f0f; /* ✅ Changed to blackish */
   color: #6b7280;
   cursor: not-allowed;
 }
@@ -731,7 +732,7 @@
 
 /* Social Login Info */
 .social-login-info {
-  background: rgba(30, 30, 30, 0.8);
+  background: #0f0f0f; /* ✅ Changed to blackish */
   padding: 2rem;
   border-radius: 16px;
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
@@ -799,7 +800,7 @@
     padding: 1rem;
     overflow-x: auto;
     scrollbar-width: thin;
-    scrollbar-color: #667eea rgba(30, 30, 30, 0.5);
+    scrollbar-color: #667eea #0f0f0f; /* ✅ Changed track color */
   }
   
   .sidebar-nav::-webkit-scrollbar {
@@ -807,7 +808,7 @@
   }
   
   .sidebar-nav::-webkit-scrollbar-track {
-    background: rgba(30, 30, 30, 0.5);
+    background: #0f0f0f; /* ✅ Changed to blackish */
     border-radius: 10px;
   }
   
@@ -937,7 +938,7 @@
 }
 
 .dashboard-main::-webkit-scrollbar-track {
-  background: rgba(30, 30, 30, 0.5);
+  background: #0f0f0f; /* ✅ Changed to blackish */
   border-radius: 10px;
 }
 

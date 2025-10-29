@@ -162,7 +162,7 @@ function Carousel() {
                   <p className="slide-description">
                     {slide.description}
                   </p>
-                  <Link to="/shop" className="shop-now-btn">
+                  <Link to="/games" className="shop-now-btn">
                     Shop Now
                   </Link>
                 </div>

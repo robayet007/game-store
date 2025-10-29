@@ -3,7 +3,7 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate, Routes, Route, useLocation } from 'react-router-dom';
 import { signOut } from 'firebase/auth';
 import { auth } from '../../firebaseConfig';
-import { isAdminUser } from '../../Utils/Admin';
+import { isAdminUser } from '../../Utils/admin';
 import Sidebar from './Sidebar/Sidebar';
 import Dashboard from './Dashboard/Dashboard'; // ✅ Import Dashboard
 import AddProduct from './AddProduct/AddProduct';

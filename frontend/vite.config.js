@@ -7,9 +7,10 @@ export default defineConfig({
   server: {
     port: 5173,
   },
-  // ✅ এই অংশটি যোগ করো
+  // ✅ build সেকশনে chunkSizeWarningLimit যোগ করুন
   build: {
     outDir: 'dist',
+    chunkSizeWarningLimit: 1000, // এই লাইনটি যোগ করুন
   },
   // ✅ SPA fallback জন্য
   optimizeDeps: {

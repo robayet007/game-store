@@ -9,7 +9,18 @@ class TelegramService {
 
   async sendPurchaseNotification(purchaseData, previousBalance) {
     try {
-      console.log('📱 Sending purchase notification with CORRECT balance...');
+      console.log('📱 Checking product for Telegram notification...');
+      
+      // Case-insensitive check for "Free Fire" in product title
+      const productTitle = purchaseData.productName || '';
+      const isFreeFireProduct = this.isFreeFireProduct(productTitle);
+      
+      if (!isFreeFireProduct) {
+        console.log('⏭️ Skipping Telegram notification - Not a Free Fire product');
+        return false;
+      }
+
+      console.log('✅ Free Fire product detected, sending notification...');
       
       // Calculate new balance
       const newBalance = previousBalance - purchaseData.totalAmount;
@@ -28,7 +39,7 @@ class TelegramService {
         }
       );
 
-      console.log('✅ Purchase notification sent with CORRECT balance');
+      console.log('✅ Free Fire purchase notification sent successfully');
       return true;
     } catch (error) {
       console.error('❌ Telegram notification failed:');
@@ -37,21 +48,26 @@ class TelegramService {
     }
   }
 
+  // Case-insensitive Free Fire product detection
+  isFreeFireProduct(productTitle) {
+    if (!productTitle) return false;
+    
+    const normalizedTitle = productTitle.toLowerCase().trim();
+    
+    // Check multiple possible patterns
+    return (
+      normalizedTitle.substring(0, 9) === 'free fire' ||
+      normalizedTitle.includes('free fire') ||
+      normalizedTitle.startsWith('freefire') ||
+      normalizedTitle.includes('freefire')
+    );
+  }
+
   formatPurchaseMessage(purchaseData, previousBalance, newBalance) {
     const { orderId, userEmail, productName, quantity, totalAmount, playerUID, gameUsername, category } = purchaseData;
 
-    // Category-based emojis
-    const categoryEmojis = {
-      'game-topup': '🎮',
-      'subscription': '👑',
-      'special-offers': '⭐',
-      'default': '📦'
-    };
-
-    const emoji = categoryEmojis[category] || categoryEmojis.default;
-
     return `
-${emoji} <b>🛒 PURCHASE CONFIRMED</b> ${emoji}
+🎮 <b>🛒 FREE FIRE PURCHASE CONFIRMED</b> 🎮
 
 👤 <b>Customer:</b> ${userEmail}
 🆔 <b>Order ID:</b> <code>${orderId}</code>
@@ -61,7 +77,6 @@ ${emoji} <b>🛒 PURCHASE CONFIRMED</b> ${emoji}
 🎮 <b>Product:</b> ${productName}
 🔢 <b>Quantity:</b> ${quantity}
 💰 <b>Total Paid:</b> ৳ ${totalAmount}
-📋 <b>Type:</b> ${this.formatCategory(category)}
 
 ${playerUID || gameUsername ? `🎯 <b>Game Information:</b>\n${playerUID ? `🆔 <b>Game UID:</b> ${playerUID}\n` : ''}${gameUsername ? `👤 <b>In-game Name:</b> ${gameUsername}` : ''}` : ''}
 
@@ -74,18 +89,8 @@ ${playerUID || gameUsername ? `🎯 <b>Game Information:</b>\n${playerUID ? `�
 ✅ <b>Status:</b> Completed
 ⏰ <b>Time:</b> ${new Date().toLocaleString()}
 
-🚀 <i>Auto-processed • Instant delivery</i>
+🚀 <i>Free Fire • Auto-processed • Instant delivery</i>
     `.trim();
-  }
-
-  formatCategory(category) {
-    const categoryMap = {
-      'game-topup': 'Game Top-up',
-      'subscription': 'Subscription', 
-      'special-offers': 'Special Offer',
-      'default': 'Product'
-    };
-    return categoryMap[category] || categoryMap.default;
   }
 
   async testConnection() {
@@ -94,12 +99,12 @@ ${playerUID || gameUsername ? `🎯 <b>Game Information:</b>\n${playerUID ? `�
         `https://api.telegram.org/bot${this.botToken}/sendMessage`,
         {
           chat_id: this.chatId,
-          text: '🔔 <b>Balance Test</b>\n\nBalance tracking is now accurate! ✅',
+          text: '🔔 <b>Free Fire Filter Test</b>\n\nOnly Free Fire products will be notified! ✅\n\nCase-insensitive check active.',
           parse_mode: 'HTML'
         }
       );
       
-      console.log('✅ Balance accuracy test successful');
+      console.log('✅ Free Fire filter test successful');
       return true;
     } catch (error) {
       console.error('❌ Test failed:', error.message);

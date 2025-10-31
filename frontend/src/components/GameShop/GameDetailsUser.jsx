@@ -39,7 +39,7 @@ const GameDetailsUser = () => {
   const getImageUrl = (imgPath) => {
     if (!imgPath) return 'https://via.placeholder.com/400x300/667eea/ffffff?text=Game+Image';
     if (imgPath.startsWith('http')) return imgPath;
-    if (imgPath.startsWith('/uploads/')) return `http://localhost:5000${imgPath}`;
+    if (imgPath.startsWith('/uploads/')) return `http://3.24.182.94:5000${imgPath}`;  // ✅ Changed here
     return 'https://via.placeholder.com/400x300/667eea/ffffff?text=Game+Image';
   };
 

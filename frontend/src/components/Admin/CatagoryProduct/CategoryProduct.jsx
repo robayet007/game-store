@@ -2,6 +2,9 @@ import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import './CategoryProduct.css';
 
+// ✅ Base URL constant
+const BASE_URL = "http://3.24.182.94:5000";
+
 const CategoryProduct = ({ category, products, onEditProduct, onDeleteProduct }) => {
   const navigate = useNavigate();
   const categoryNames = {
@@ -22,9 +25,9 @@ const CategoryProduct = ({ category, products, onEditProduct, onDeleteProduct })
     ).join(' ');
   };
 
-  // ✅ FIX: Correct image URL function
+  // ✅ FIXED: Correct image URL function with BASE_URL
   const getImageUrl = (imagePath) => {
-    if (!imagePath) return '/default-product.jpg';
+    if (!imagePath) return `${BASE_URL}/default-product.jpg`;
     
     // যদি imagePath already full URL হয়
     if (imagePath.startsWith('http')) {
@@ -33,11 +36,11 @@ const CategoryProduct = ({ category, products, onEditProduct, onDeleteProduct })
     
     // যদি imagePath relative path হয় (/uploads/filename.jpg)
     if (imagePath.startsWith('/uploads/')) {
-      return `http://localhost:5000${imagePath}`;
+      return `${BASE_URL}${imagePath}`;  // ✅ BASE_URL use করা হয়েছে
     }
     
     // অন্য কোন case-এ default image
-    return '/default-product.jpg';
+    return `${BASE_URL}/default-product.jpg`;  // ✅ BASE_URL use করা হয়েছে
   };
 
   return (
@@ -66,7 +69,7 @@ const CategoryProduct = ({ category, products, onEditProduct, onDeleteProduct })
                   alt={product.title || product.name}
                   onError={(e) => {
                     console.log('❌ Image failed to load:', product.image || product.imageUrl);
-                    e.target.src = '/default-product.jpg';
+                    e.target.src = `${BASE_URL}/default-product.jpg`;  // ✅ BASE_URL use করা হয়েছে
                   }}
                 />
                 <div className="product-badge">

@@ -6,6 +6,10 @@ import {
 } from 'lucide-react';
 import './Dashboard.css';
 
+// ✅ Base URL constant
+const BASE_URL = "http://3.24.182.94:5000";
+const API_BASE_URL = `${BASE_URL}/api`;
+
 const Dashboard = ({ onSectionChange, onStatsUpdate }) => {
   const [activeSection, setActiveSection] = useState('overview');
   const [users, setUsers] = useState([]);
@@ -25,8 +29,8 @@ const Dashboard = ({ onSectionChange, onStatsUpdate }) => {
       
       // ✅ Parallel API calls for better performance
       const [usersResponse, paymentsResponse] = await Promise.allSettled([
-        fetch('http://localhost:5000/api/admin/users'),
-        fetch('http://localhost:5000/api/payments/admin/pending')
+        fetch(`${API_BASE_URL}/admin/users`),  // ✅ BASE_URL use করা হয়েছে
+        fetch(`${API_BASE_URL}/payments/admin/pending`)  // ✅ BASE_URL use করা হয়েছে
       ]);
 
       let usersData = { users: [] };
@@ -108,7 +112,7 @@ const Dashboard = ({ onSectionChange, onStatsUpdate }) => {
       setActionLoading(payment._id);
       console.log('🔄 Approving payment:', payment._id);
       
-      const response = await fetch(`http://localhost:5000/api/admin/approve-payment/${payment._id}`, {
+      const response = await fetch(`${API_BASE_URL}/admin/approve-payment/${payment._id}`, {  // ✅ BASE_URL use করা হয়েছে
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
@@ -156,7 +160,7 @@ const Dashboard = ({ onSectionChange, onStatsUpdate }) => {
       setActionLoading(payment._id);
       console.log('🔄 Rejecting payment:', payment._id);
       
-      const response = await fetch(`http://localhost:5000/api/admin/reject-payment/${payment._id}`, {
+      const response = await fetch(`${API_BASE_URL}/admin/reject-payment/${payment._id}`, {  // ✅ BASE_URL use করা হয়েছে
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',

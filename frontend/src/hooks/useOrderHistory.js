@@ -1,5 +1,9 @@
 import { useState, useEffect } from 'react';
 
+// ✅ Base URL constant
+const BASE_URL = "http://3.24.182.94:5000";
+const API_BASE_URL = `${BASE_URL}/api`;
+
 export const useOrderHistory = (userId) => {
   const [orders, setOrders] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -16,7 +20,7 @@ export const useOrderHistory = (userId) => {
       setError(null);
       
       const response = await fetch(
-        `http://localhost:5000/api/orders/user/${userId}?page=${page}&limit=${limit}`
+        `${API_BASE_URL}/orders/user/${userId}?page=${page}&limit=${limit}`  // ✅ BASE_URL use করা হয়েছে
       );
       
       if (!response.ok) {
@@ -45,7 +49,7 @@ export const useOrderHistory = (userId) => {
     
     try {
       const response = await fetch(
-        `http://localhost:5000/api/orders/user/${userId}/stats`
+        `${API_BASE_URL}/orders/user/${userId}/stats`  // ✅ BASE_URL use করা হয়েছে
       );
       
       if (!response.ok) {

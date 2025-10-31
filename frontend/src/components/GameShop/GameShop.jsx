@@ -5,6 +5,9 @@ import { useNavigate } from 'react-router-dom';
 import { useProducts } from '../../hooks/useProducts';
 import "./GameShop.css";
 
+// ✅ Base URL constant
+const BASE_URL = "http://3.24.182.94:5000";
+
 const categories = ["All", "Battle Royale", "FPS", "MOBA", "Sports", "Strategy", "RPG"];
 
 function GameShop() {
@@ -20,6 +23,21 @@ function GameShop() {
     const matchesSearch = (game.title || game.name).toLowerCase().includes(searchQuery.toLowerCase());
     return matchesCategory && matchesSearch;
   });
+
+  // ✅ Image URL handler function
+  const getImageUrl = (imgPath) => {
+    if (!imgPath) return 'https://images.unsplash.com/photo-1550745165-9bc0b252726f?w=400&h=300&fit=crop';
+    
+    if (imgPath.startsWith('http')) {
+      return imgPath;
+    }
+    
+    if (imgPath.startsWith('/uploads/')) {
+      return `${BASE_URL}${imgPath}`;  // ✅ BASE_URL use করা হয়েছে
+    }
+    
+    return 'https://images.unsplash.com/photo-1550745165-9bc0b252726f?w=400&h=300&fit=crop';
+  };
 
   // ✅ UPDATE: Handle card click - navigate to game details page
   const handleCardClick = (game) => {
@@ -201,20 +219,5 @@ function GameShop() {
     </div>
   );
 }
-
-// Image URL handler function
-const getImageUrl = (imgPath) => {
-  if (!imgPath) return 'https://images.unsplash.com/photo-1550745165-9bc0b252726f?w=400&h=300&fit=crop';
-  
-  if (imgPath.startsWith('http')) {
-    return imgPath;
-  }
-  
-  if (imgPath.startsWith('/uploads/')) {
-    return `http://localhost:5000${imgPath}`;
-  }
-  
-  return 'https://images.unsplash.com/photo-1550745165-9bc0b252726f?w=400&h=300&fit=crop';
-};
 
 export default GameShop;

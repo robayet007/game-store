@@ -4,6 +4,9 @@ import { useProducts } from '../../../hooks/useProducts';
 import { productAPI } from '../../../services/api';
 import './GameDetails.css';
 
+// ✅ Base URL constant
+const BASE_URL = "http://3.24.182.94:5000";
+
 const GameDetails = () => {
   const { id } = useParams();
   const navigate = useNavigate();
@@ -44,7 +47,7 @@ const GameDetails = () => {
   const getImageUrl = (imgPath) => {
     if (!imgPath) return 'https://via.placeholder.com/400x300/667eea/ffffff?text=Game+Image';
     if (imgPath.startsWith('http')) return imgPath;
-    if (imgPath.startsWith('/uploads/')) return `http://localhost:5000${imgPath}`;
+    if (imgPath.startsWith('/uploads/')) return `${BASE_URL}${imgPath}`;  // ✅ BASE_URL use করা হয়েছে
     return 'https://via.placeholder.com/400x300/667eea/ffffff?text=Game+Image';
   };
 

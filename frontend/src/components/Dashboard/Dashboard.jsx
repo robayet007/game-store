@@ -28,6 +28,10 @@ import { usePayment } from '../../hooks/usePayment';
 import AddFund from './AddFund/AddFund';
 import './Dashboard.css';
 
+// ✅ Base URL constant
+const BASE_URL = "http://3.24.182.94:5000";
+const API_BASE_URL = `${BASE_URL}/api`;
+
 const Dashboard = () => {
   const [activeTab, setActiveTab] = useState('profile');
   const [user, setUser] = useState(null);
@@ -93,7 +97,7 @@ const Dashboard = () => {
       setOrdersError('');
       
       const response = await fetch(
-        `http://localhost:5000/api/orders/user/${userId}?page=1&limit=20`
+        `${API_BASE_URL}/orders/user/${userId}?page=1&limit=20`  // ✅ BASE_URL use করা হয়েছে
       );
       
       if (!response.ok) {
@@ -121,7 +125,7 @@ const Dashboard = () => {
     
     try {
       const response = await fetch(
-        `http://localhost:5000/api/orders/user/${userId}/stats`
+        `${API_BASE_URL}/orders/user/${userId}/stats`  // ✅ BASE_URL use করা হয়েছে
       );
       
       if (!response.ok) {
@@ -160,13 +164,13 @@ const Dashboard = () => {
   // Get product image based on product name and category
   const getProductImage = (productName, category) => {
     const gameImages = {
-      'free fire': '/images/free-fire.jpg',
-      'pubg': '/images/pubg.jpg',
-      'mobile legends': '/images/mlbb.jpg',
-      'cod': '/images/cod.jpg',
-      'netflix': '/images/netflix.jpg',
-      'spotify': '/images/spotify.jpg',
-      'youtube': '/images/youtube.jpg'
+      'free fire': `${BASE_URL}/images/free-fire.jpg`,  // ✅ BASE_URL use করা হয়েছে
+      'pubg': `${BASE_URL}/images/pubg.jpg`,
+      'mobile legends': `${BASE_URL}/images/mlbb.jpg`,
+      'cod': `${BASE_URL}/images/cod.jpg`,
+      'netflix': `${BASE_URL}/images/netflix.jpg`,
+      'spotify': `${BASE_URL}/images/spotify.jpg`,
+      'youtube': `${BASE_URL}/images/youtube.jpg`
     };
 
     const productKey = productName.toLowerCase();
@@ -178,10 +182,10 @@ const Dashboard = () => {
 
     // Default images based on category
     const categoryImages = {
-      'game-topup': '/images/game-default.jpg',
-      'subscription': '/images/subscription-default.jpg',
-      'special-offers': '/images/special-offer.jpg',
-      'default': '/images/product-default.jpg'
+      'game-topup': `${BASE_URL}/images/game-default.jpg`,
+      'subscription': `${BASE_URL}/images/subscription-default.jpg`,
+      'special-offers': `${BASE_URL}/images/special-offer.jpg`,
+      'default': `${BASE_URL}/images/product-default.jpg`
     };
 
     return categoryImages[category] || categoryImages.default;
@@ -366,7 +370,7 @@ const Dashboard = () => {
                       src={getProductImage(order.productName, order.category)}
                       alt={order.productName}
                       onError={(e) => {
-                        e.target.src = '/images/product-default.jpg';
+                        e.target.src = `${BASE_URL}/images/product-default.jpg`;  // ✅ BASE_URL use করা হয়েছে
                       }}
                     />
                   </div>

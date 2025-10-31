@@ -3,6 +3,9 @@ import { useNavigate } from 'react-router-dom';
 import { useProducts } from '../../hooks/useProducts';
 import './Subscriptions.css';
 
+// ✅ Base URL constant
+const BASE_URL = "http://3.24.182.94:5000";
+
 const Subscriptions = () => {
   const navigate = useNavigate();
   const { products, loading, error } = useProducts('subscription');
@@ -16,7 +19,7 @@ const Subscriptions = () => {
     }
     
     if (imgPath.startsWith('/uploads/')) {
-      return `http://localhost:5000${imgPath}`;
+      return `${BASE_URL}${imgPath}`;  // ✅ BASE_URL use করা হয়েছে
     }
     
     return 'https://via.placeholder.com/100x100/667eea/ffffff?text=SUB';

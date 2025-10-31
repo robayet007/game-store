@@ -1,7 +1,7 @@
 import axios from 'axios';
 
 const API = axios.create({
-  baseURL: 'http://localhost:5000/api',
+  baseURL: 'http://3.24.182.94:5000/api',  // ✅ Changed to your live server
 });
 
 // ✅ Add request interceptor for better error handling
@@ -30,7 +30,6 @@ API.interceptors.response.use(
     return Promise.reject(error);
   }
 );
-
 
 // Product APIs
 export const productAPI = {

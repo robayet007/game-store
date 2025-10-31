@@ -1,6 +1,9 @@
 import { useNavigate } from 'react-router-dom';
 import "./Offers.css"
 
+// ✅ Base URL constant
+const BASE_URL = "http://3.24.182.94:5000";
+
 const OfferCard = ({ product }) => {
   const navigate = useNavigate();
   
@@ -30,7 +33,7 @@ const OfferCard = ({ product }) => {
     }
     
     if (imgPath.startsWith('/uploads/')) {
-      return `http://localhost:5000${imgPath}`;
+      return `${BASE_URL}${imgPath}`;  // ✅ BASE_URL use করা হয়েছে
     }
     
     return 'https://i.pinimg.com/736x/53/12/73/5312738a7102a3edb2728eea63f636de.jpg';

@@ -7,7 +7,7 @@ import {
 import './Dashboard.css';
 
 // ✅ Base URL constant
-const BASE_URL = "http://3.24.182.94:5000";
+const BASE_URL = "https://noncompoundable-unconstruable-karyn.ngrok-free.dev";
 const API_BASE_URL = `${BASE_URL}/api`;
 
 const Dashboard = ({ onSectionChange, onStatsUpdate }) => {

@@ -6,7 +6,7 @@ import { useProducts } from '../../hooks/useProducts';
 import "./GameShop.css";
 
 // ✅ Base URL constant
-const BASE_URL = "http://3.24.182.94:5000";
+const BASE_URL = "https://noncompoundable-unconstruable-karyn.ngrok-free.dev";
 
 const categories = ["All", "Battle Royale", "FPS", "MOBA", "Sports", "Strategy", "RPG"];
 

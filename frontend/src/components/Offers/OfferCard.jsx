@@ -2,7 +2,7 @@ import { useNavigate } from 'react-router-dom';
 import "./Offers.css"
 
 // ✅ Base URL constant
-const BASE_URL = "http://3.24.182.94:5000";
+const BASE_URL = "https://noncompoundable-unconstruable-karyn.ngrok-free.dev";
 
 const OfferCard = ({ product }) => {
   const navigate = useNavigate();

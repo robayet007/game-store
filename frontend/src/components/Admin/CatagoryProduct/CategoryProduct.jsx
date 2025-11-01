@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import './CategoryProduct.css';
 
 // ✅ Base URL constant
-const BASE_URL = "http://3.24.182.94:5000";
+const BASE_URL = "https://metagamestore.duckdns.org";
 
 const CategoryProduct = ({ category, products, onEditProduct, onDeleteProduct }) => {
   const navigate = useNavigate();

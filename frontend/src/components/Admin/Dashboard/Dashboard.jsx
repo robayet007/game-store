@@ -7,7 +7,7 @@ import {
 import './Dashboard.css';
 
 // ✅ Base URL constant
-const BASE_URL = "http://metagamestore.duckdns.org";
+const BASE_URL = "http://3.24.182.94:5000";
 const API_BASE_URL = `${BASE_URL}/api`;
 
 const Dashboard = ({ onSectionChange, onStatsUpdate }) => {

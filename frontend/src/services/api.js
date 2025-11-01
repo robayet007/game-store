@@ -1,7 +1,7 @@
 import axios from 'axios';
 
 const API = axios.create({
-  baseURL: 'https://metagamestore.duckdns.org/api',  // ✅ Changed to your live server
+  baseURL: 'http://3.24.182.94:5000/api',  // ✅ Changed to your live server
 });
 
 // ✅ Add request interceptor for better error handling

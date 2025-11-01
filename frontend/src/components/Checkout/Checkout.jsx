@@ -5,7 +5,7 @@ import { Minus, Plus, Wallet } from 'lucide-react';
 import styles from './Checkout.module.css';
 
 // Base URL constant
-const BASE_URL = "http://metagamestore.duckdns.org";
+const BASE_URL = "http://3.24.182.94:5000";
 
 const Checkout = ({ user }) => {
   const { id } = useParams();

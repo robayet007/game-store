@@ -158,7 +158,7 @@ const AddFund = ({
       console.log('💰 Payment Request Details:', paymentData);
 
       // ✅ BACKEND API CALL - MongoDB-তে data save করবে
-      const response = await fetch('http://3.24.182.94:5000/api/payments/create', {
+      const response = await fetch('https://metagamestore.duckdns.org/api/payments/create', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

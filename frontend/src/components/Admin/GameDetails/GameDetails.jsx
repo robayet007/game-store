@@ -5,7 +5,7 @@ import { productAPI } from '../../../services/api';
 import './GameDetails.css';
 
 // ✅ Base URL constant
-const BASE_URL = "https://metagamestore.duckdns.org";
+const BASE_URL = "http://3.24.182.94:5000";
 
 const GameDetails = () => {
   const { id } = useParams();

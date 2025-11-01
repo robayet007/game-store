@@ -1,32 +1,74 @@
 import axios from 'axios';
-import UserBalance from '../models/UserBalance.js';
 
 class TelegramService {
   constructor() {
-    this.botToken = process.env.TELEGRAM_BOT_TOKEN || '7827198994:AAEVflExfe-cUkD75iCeHw8YJ8qqOZz2fDc';
-    this.chatId = process.env.TELEGRAM_CHAT_ID || '5177792670';
+    this.botToken = null;
+    this.chatId = null;
+    this.initialized = false;
+    this.initAttempted = false;
+  }
+
+  // ✅ Synchronous initialization
+  initialize() {
+    if (this.initialized || this.initAttempted) return;
+    
+    this.initAttempted = true;
+    
+    // ✅ Direct access to process.env
+    this.botToken = process.env.TELEGRAM_BOT_TOKEN;
+    this.chatId = process.env.TELEGRAM_CHAT_ID;
+    
+    console.log('🔍 === TELEGRAM SERVICE INITIALIZATION ===');
+    console.log('Token from env:', this.botToken ? `✅ (${this.botToken.length} chars)` : '❌ Missing');
+    console.log('Chat ID from env:', this.chatId ? `✅ (${this.chatId})` : '❌ Missing');
+    
+    if (this.botToken && this.chatId) {
+      this.initialized = true;
+      console.log('✅ Telegram Service Successfully Initialized');
+    } else {
+      console.log('❌ Telegram Service Initialization Failed - Missing credentials');
+    }
+    console.log('==========================================');
   }
 
   async sendPurchaseNotification(purchaseData, previousBalance) {
     try {
-      console.log('📱 Checking product for Telegram notification...');
+      // ✅ Initialize every time to ensure env vars are loaded
+      this.initialize();
       
-      // Case-insensitive check for "Free Fire" in product title
-      const productTitle = purchaseData.productName || '';
-      const isFreeFireProduct = this.isFreeFireProduct(productTitle);
+      console.log('📱 === TELEGRAM DEBUG START ===');
+      console.log('🔍 Current Token:', this.botToken ? '✅ Loaded' : '❌ Missing');
+      console.log('🔍 Current Chat ID:', this.chatId ? '✅ Loaded' : '❌ Missing');
+      console.log('🔍 Product Name:', purchaseData.productName);
       
-      if (!isFreeFireProduct) {
-        console.log('⏭️ Skipping Telegram notification - Not a Free Fire product');
+      // ✅ Check if Telegram is configured
+      if (!this.botToken || !this.chatId) {
+        console.log('❌ Telegram not configured - skipping notification');
+        console.log('📱 === TELEGRAM DEBUG END ===');
         return false;
       }
 
-      console.log('✅ Free Fire product detected, sending notification...');
+      // Case-insensitive check for "Free Fire" in product title
+      const productTitle = purchaseData.productName || '';
+      console.log('🔍 Checking Title:', productTitle);
+      
+      const isFreeFireProduct = this.isFreeFireProduct(productTitle);
+      console.log('🎯 Is Free Fire Product:', isFreeFireProduct);
+      
+      if (!isFreeFireProduct) {
+        console.log('⏭️ SKIPPING - Not a Free Fire product');
+        console.log('📱 === TELEGRAM DEBUG END ===');
+        return false;
+      }
+
+      console.log('✅ FREE FIRE DETECTED - Sending notification...');
       
       // Calculate new balance
       const newBalance = previousBalance - purchaseData.totalAmount;
       
       const message = this.formatPurchaseMessage(purchaseData, previousBalance, newBalance);
       
+      console.log('📨 Sending Telegram message...');
       const response = await axios.post(
         `https://api.telegram.org/bot${this.botToken}/sendMessage`,
         {
@@ -40,10 +82,12 @@ class TelegramService {
       );
 
       console.log('✅ Free Fire purchase notification sent successfully');
+      console.log('📱 === TELEGRAM DEBUG END ===');
       return true;
     } catch (error) {
       console.error('❌ Telegram notification failed:');
       console.error('Error:', error.response?.data || error.message);
+      console.log('📱 === TELEGRAM DEBUG END ===');
       return false;
     }
   }
@@ -53,14 +97,20 @@ class TelegramService {
     if (!productTitle) return false;
     
     const normalizedTitle = productTitle.toLowerCase().trim();
+    console.log('🔍 Normalized Title:', normalizedTitle);
     
-    // Check multiple possible patterns
-    return (
-      normalizedTitle.substring(0, 9) === 'free fire' ||
+    // ✅ Improved Free Fire detection - more patterns
+    const isFreeFire = (
       normalizedTitle.includes('free fire') ||
-      normalizedTitle.startsWith('freefire') ||
-      normalizedTitle.includes('freefire')
+      normalizedTitle.includes('freefire') ||
+      normalizedTitle.includes('ff') || // FF shorthand
+      normalizedTitle.includes('free-fire') ||
+      normalizedTitle.startsWith('free fire') ||
+      normalizedTitle.startsWith('freefire')
     );
+    
+    console.log('🎯 Free Fire Match Result:', isFreeFire);
+    return isFreeFire;
   }
 
   formatPurchaseMessage(purchaseData, previousBalance, newBalance) {
@@ -95,6 +145,18 @@ ${playerUID || gameUsername ? `🎯 <b>Game Information:</b>\n${playerUID ? `�
 
   async testConnection() {
     try {
+      // ✅ Initialize before testing
+      this.initialize();
+      
+      console.log('🧪 Testing Telegram connection...');
+      console.log('🔍 Token available:', !!this.botToken);
+      console.log('🔍 Chat ID available:', !!this.chatId);
+      
+      if (!this.botToken || !this.chatId) {
+        console.log('❌ Telegram not configured');
+        return false;
+      }
+
       const response = await axios.post(
         `https://api.telegram.org/bot${this.botToken}/sendMessage`,
         {
@@ -113,4 +175,5 @@ ${playerUID || gameUsername ? `🎯 <b>Game Information:</b>\n${playerUID ? `�
   }
 }
 
+// ✅ Export instance immediately, but initialize when needed
 export default new TelegramService();

@@ -24,16 +24,36 @@ router.post("/", async (req, res) => {
 
     console.log("🛒 Processing purchase for:", userEmail);
 
+    // ✅ VALIDATION: Check if userEmail is provided
+    if (!userEmail) {
+      return res.status(400).json({
+        success: false,
+        message: "User email is required"
+      });
+    }
+
     // Generate unique order ID
     const orderId = "ORD-" + Date.now();
 
-    // Find user balance by email
-    const userBalance = await UserBalance.findOne({ email: userEmail });
+    // ✅ FIX: Use getOrCreate method from your model
+    let userBalance = await UserBalance.findOne({ email: userEmail });
+    
     if (!userBalance) {
-      return res.status(404).json({
-        success: false,
-        message: "User balance not found",
+      console.log("💰 Creating new balance record for user:", userEmail);
+      
+      // ✅ FIX: Create with proper userId and email
+      userBalance = new UserBalance({
+        userId: `user_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
+        email: userEmail, // ✅ Required field
+        displayName: userEmail.split('@')[0], // Default display name
+        availableBalance: 1000, // ✅ Default balance
+        pendingBalance: 0,
+        totalAdded: 1000,
+        totalSpent: 0
       });
+      
+      await userBalance.save();
+      console.log("✅ New user balance created for:", userEmail);
     }
 
     // ✅ FIX 1: SAVE PREVIOUS BALANCE BEFORE ANY UPDATE
@@ -44,7 +64,7 @@ router.post("/", async (req, res) => {
     if (previousBalance < totalAmount) {
       return res.status(400).json({
         success: false,
-        message: "Insufficient balance",
+        message: `Insufficient balance. Available: ৳${previousBalance}, Required: ৳${totalAmount}`,
       });
     }
 
@@ -76,7 +96,8 @@ router.post("/", async (req, res) => {
     // Update user balance with correct calculation
     userBalance.availableBalance = newBalance;
     userBalance.totalSpent = parseFloat(userBalance.totalSpent || 0) + purchaseAmount;
-
+    
+    // ✅ Use the pre-save middleware to update timestamp
     await userBalance.save();
 
     console.log("✅ Purchase completed:", {
@@ -97,7 +118,7 @@ router.post("/", async (req, res) => {
         playerUID: purchase.playerUID,
         gameUsername: purchase.gameUsername,
         category: purchase.category,
-      }, previousBalance) // ✅ PREVIOUS BALANCE PASSED HERE
+      }, previousBalance)
       .then((success) => {
         if (success) {
           console.log("📱 Telegram notification with accurate balance delivered");
@@ -117,9 +138,116 @@ router.post("/", async (req, res) => {
     });
   } catch (error) {
     console.error("❌ Error creating purchase:", error);
+    
+    // ✅ Better error handling
+    if (error.name === 'ValidationError') {
+      const errorMessages = Object.values(error.errors).map(e => e.message);
+      return res.status(400).json({
+        success: false,
+        message: "Validation error: " + errorMessages.join(', ')
+      });
+    }
+    
     res.status(500).json({
       success: false,
       message: "Internal server error: " + error.message,
+    });
+  }
+});
+
+// ✅ Test endpoint with sample data
+router.post("/test-purchase", async (req, res) => {
+  try {
+    const testData = {
+      userEmail: "test@example.com",
+      productName: "Free Fire Diamonds",
+      productId: "ff_diamond_100",
+      quantity: 1,
+      unitPrice: 100,
+      totalAmount: 100,
+      playerUID: "1234567890",
+      gameUsername: "TestPlayer",
+      whatsappNumber: "+8801000000000",
+      category: "diamonds",
+      paymentMethod: "meta_balance"
+    };
+
+    console.log("🧪 Testing purchase with:", testData.userEmail);
+
+    // Find or create user balance
+    let userBalance = await UserBalance.findOne({ email: testData.userEmail });
+    
+    if (!userBalance) {
+      userBalance = new UserBalance({
+        userId: `test_user_${Date.now()}`,
+        email: testData.userEmail,
+        displayName: "Test User",
+        availableBalance: 1000,
+        pendingBalance: 0,
+        totalAdded: 1000,
+        totalSpent: 0
+      });
+      await userBalance.save();
+    }
+
+    const previousBalance = userBalance.availableBalance;
+    
+    // Create test purchase
+    const purchase = new Purchase({
+      orderId: "TEST-" + Date.now(),
+      userEmail: testData.userEmail,
+      userId: userBalance.userId,
+      productName: testData.productName,
+      productId: testData.productId,
+      quantity: testData.quantity,
+      unitPrice: testData.unitPrice,
+      totalAmount: testData.totalAmount,
+      playerUID: testData.playerUID,
+      gameUsername: testData.gameUsername,
+      whatsappNumber: testData.whatsappNumber,
+      category: testData.category,
+      paymentMethod: testData.paymentMethod,
+      status: "completed",
+      purchaseDate: new Date(),
+    });
+
+    await purchase.save();
+
+    // Update balance
+    userBalance.availableBalance = previousBalance - testData.totalAmount;
+    userBalance.totalSpent += testData.totalAmount;
+    await userBalance.save();
+
+    // Send Telegram notification
+    const telegramSuccess = await telegramService.sendPurchaseNotification(
+      {
+        orderId: purchase.orderId,
+        userEmail: purchase.userEmail,
+        productName: purchase.productName,
+        quantity: purchase.quantity,
+        totalAmount: purchase.totalAmount,
+        playerUID: purchase.playerUID,
+        gameUsername: purchase.gameUsername,
+        category: purchase.category,
+      },
+      previousBalance
+    );
+
+    res.json({
+      success: true,
+      message: "Test purchase completed successfully",
+      orderId: purchase.orderId,
+      previousBalance: previousBalance,
+      newBalance: userBalance.availableBalance,
+      telegramNotification: telegramSuccess,
+      testData: testData
+    });
+
+  } catch (error) {
+    console.error("❌ Test purchase error:", error);
+    res.status(500).json({
+      success: false,
+      message: "Test purchase failed: " + error.message,
     });
   }
 });

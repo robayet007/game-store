@@ -1,3 +1,4 @@
+// models/UserBalance.js
 import mongoose from 'mongoose';
 
 const userBalanceSchema = new mongoose.Schema({
@@ -13,7 +14,9 @@ const userBalanceSchema = new mongoose.Schema({
   email: {
     type: String,
     required: true,
-    trim: true
+    trim: true,
+    unique: true, // ✅ Email should also be unique
+    index: true   // ✅ Add index for faster search by email
   },
   displayName: {
     type: String,
@@ -60,7 +63,27 @@ userBalanceSchema.pre('save', function(next) {
   next();
 });
 
-// Static method to get or create balance
+// ✅ NEW: Static method to find or create by email
+userBalanceSchema.statics.findOrCreateByEmail = async function(email, userData = {}) {
+  let balance = await this.findOne({ email });
+  
+  if (!balance) {
+    balance = new this({
+      userId: userData.userId || `user_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
+      email: email,
+      displayName: userData.displayName || email.split('@')[0],
+      availableBalance: userData.availableBalance || 1000,
+      pendingBalance: userData.pendingBalance || 0,
+      totalAdded: userData.totalAdded || (userData.availableBalance || 1000),
+      totalSpent: userData.totalSpent || 0
+    });
+    await balance.save();
+  }
+  
+  return balance;
+};
+
+// ✅ Keep the existing method for userId
 userBalanceSchema.statics.getOrCreate = async function(userId, userData = {}) {
   let balance = await this.findOne({ userId });
   
@@ -69,10 +92,10 @@ userBalanceSchema.statics.getOrCreate = async function(userId, userData = {}) {
       userId: userId,
       email: userData.email || 'unknown@email.com',
       displayName: userData.displayName || '',
-      availableBalance: 0,
-      pendingBalance: 0,
-      totalAdded: 0,
-      totalSpent: 0
+      availableBalance: userData.availableBalance || 0,
+      pendingBalance: userData.pendingBalance || 0,
+      totalAdded: userData.totalAdded || 0,
+      totalSpent: userData.totalSpent || 0
     });
     await balance.save();
   }

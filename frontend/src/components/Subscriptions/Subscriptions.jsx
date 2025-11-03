@@ -7,12 +7,13 @@ const Subscriptions = () => {
   const navigate = useNavigate();
   const { products, loading, error } = useProducts('subscription');
 
-  // ✅ FIXED: Improved image URL handling for Vercel
+  // ✅ FIXED: Better image URL handling with working fallbacks
   const getImageUrl = (imgPath) => {
-    console.log('Image Path:', imgPath); // Debugging
+    console.log('Original Image Path:', imgPath);
     
     if (!imgPath) {
-      return 'https://via.placeholder.com/200x200/667eea/ffffff?text=GAME+SUB';
+      // ✅ Use a reliable fallback image service
+      return 'https://images.unsplash.com/photo-1550745165-9bc0b252726f?w=200&h=200&fit=crop&crop=center';
     }
     
     // যদি image URL ইতিমধ্যে full URL হয়
@@ -20,9 +21,8 @@ const Subscriptions = () => {
       return imgPath;
     }
     
-    // ✅ Vercel proxy through image load - FIXED PATH
+    // ✅ Vercel proxy through image load
     if (imgPath.startsWith('/uploads/')) {
-      // এটি কাজ করবে: /api/uploads/filename.jpg → http://13.236.52.33:5000/uploads/filename.jpg
       return `/api${imgPath}`;
     }
     
@@ -32,21 +32,46 @@ const Subscriptions = () => {
     }
     
     // ✅ যদি শুধু filename থাকে (without path)
-    if (imgPath.includes('.')) {
+    if (imgPath.includes('.') && !imgPath.startsWith('/')) {
       return `/api/uploads/${imgPath}`;
     }
     
-    return 'https://via.placeholder.com/200x200/667eea/ffffff?text=GAME+SUB';
+    // ✅ Reliable fallback images from Unsplash
+    const fallbackImages = [
+      'https://images.unsplash.com/photo-1550745165-9bc0b252726f?w=200&h=200&fit=crop&crop=center', // Gaming 1
+      'https://images.unsplash.com/photo-1542751371-adc38448a05e?w=200&h=200&fit=crop&crop=center', // Gaming 2
+      'https://images.unsplash.com/photo-1593305841991-05c297ba4575?w=200&h=200&fit=crop&crop=center', // Gaming 3
+      'https://images.unsplash.com/photo-1511512578047-dfb367046420?w=200&h=200&fit=crop&crop=center', // Gaming 4
+    ];
+    
+    const randomIndex = Math.floor(Math.random() * fallbackImages.length);
+    return fallbackImages[randomIndex];
   };
 
-  // ✅ Debugging: products load হলে check করুন
+  // ✅ Improved error handling for images
+  const handleImageError = (e, productTitle) => {
+    console.error(`Image failed to load for: ${productTitle}`, e.target.src);
+    
+    // ✅ Use data URL as final fallback (always works)
+    e.target.src = 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjAwIiBoZWlnaHQ9IjIwMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KICA8cmVjdCB3aWR0aD0iMTAwJSIgaGVpZ2h0PSIxMDAlIiBmaWxsPSIjNjY3ZWVhIi8+CiAgPHRleHQgeD0iNTAlIiB5PSI1MCUiIGZvbnQtc2l6ZT0iMTQiIGZpbGw9IndoaXRlIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBkeT0iMC4zZW0iPkdBTUUgU1VCPC90ZXh0Pgo8L3N2Zz4=';
+    e.target.style.opacity = '0.8';
+    e.target.style.backgroundColor = '#667eea';
+  };
+
+  const handleImageLoad = (e, productTitle) => {
+    console.log(`Image loaded successfully: ${productTitle}`);
+    e.target.style.opacity = '1';
+  };
+
+  // ✅ Debugging
   React.useEffect(() => {
     if (products && products.length > 0) {
-      console.log('Products with image URLs:', 
+      console.log('All products with image info:', 
         products.map(p => ({
           title: p.title,
           originalImage: p.image,
-          resolvedUrl: getImageUrl(p.image)
+          finalUrl: getImageUrl(p.image),
+          hasImage: !!p.image
         }))
       );
     }
@@ -123,15 +148,13 @@ const Subscriptions = () => {
                   <img 
                     src={getImageUrl(product.image || product.imageUrl)} 
                     alt={product.title || product.name}
-                    onError={(e) => {
-                      console.error('Image failed to load:', e.target.src);
-                      e.target.src = 'https://via.placeholder.com/200x200/667eea/ffffff?text=IMAGE+ERROR';
-                      e.target.style.opacity = '0.7';
-                    }}
-                    onLoad={(e) => {
-                      console.log('Image loaded successfully:', product.title);
-                    }}
+                    onError={(e) => handleImageError(e, product.title || product.name)}
+                    onLoad={(e) => handleImageLoad(e, product.title || product.name)}
                     loading="lazy"
+                    style={{
+                      transition: 'opacity 0.3s ease',
+                      borderRadius: '8px'
+                    }}
                   />
                 </div>
                 <div className="card-info-horizontal">

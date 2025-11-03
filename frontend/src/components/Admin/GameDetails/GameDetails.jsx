@@ -4,8 +4,8 @@ import { useProducts } from '../../../hooks/useProducts';
 import { productAPI } from '../../../services/api';
 import './GameDetails.css';
 
-// ✅ Base URL constant
-const BASE_URL = "http://13.236.52.33:5000";
+// ✅ Base URL constant - Vercel proxy use korbe
+const BASE_URL = ""; // Empty string for relative paths
 
 const GameDetails = () => {
   const { id } = useParams();
@@ -47,7 +47,7 @@ const GameDetails = () => {
   const getImageUrl = (imgPath) => {
     if (!imgPath) return 'https://via.placeholder.com/400x300/667eea/ffffff?text=Game+Image';
     if (imgPath.startsWith('http')) return imgPath;
-    if (imgPath.startsWith('/uploads/')) return `${BASE_URL}${imgPath}`;  // ✅ BASE_URL use করা হয়েছে
+    if (imgPath.startsWith('/uploads/')) return `/api${imgPath}`;  // ✅ Vercel proxy use korbe
     return 'https://via.placeholder.com/400x300/667eea/ffffff?text=Game+Image';
   };
 

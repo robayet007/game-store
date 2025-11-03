@@ -6,9 +6,9 @@ import {
 } from 'lucide-react';
 import './Dashboard.css';
 
-// ✅ Base URL constant
-const BASE_URL = "http://13.236.52.33:5000";
-const API_BASE_URL = `${BASE_URL}/api`;
+// ✅ Base URL constant - Vercel proxy use korbe
+const BASE_URL = ""; // Empty string for relative paths
+const API_BASE_URL = "/api"; // Direct API path for Vercel
 
 const Dashboard = ({ onSectionChange, onStatsUpdate }) => {
   const [activeSection, setActiveSection] = useState('overview');
@@ -29,8 +29,8 @@ const Dashboard = ({ onSectionChange, onStatsUpdate }) => {
       
       // ✅ Parallel API calls for better performance
       const [usersResponse, paymentsResponse] = await Promise.allSettled([
-        fetch(`${API_BASE_URL}/admin/users`),  // ✅ BASE_URL use করা হয়েছে
-        fetch(`${API_BASE_URL}/payments/admin/pending`)  // ✅ BASE_URL use করা হয়েছে
+        fetch(`${API_BASE_URL}/admin/users`),  // ✅ Vercel proxy use korbe
+        fetch(`${API_BASE_URL}/payments/admin/pending`)  // ✅ Vercel proxy use korbe
       ]);
 
       let usersData = { users: [] };
@@ -112,7 +112,7 @@ const Dashboard = ({ onSectionChange, onStatsUpdate }) => {
       setActionLoading(payment._id);
       console.log('🔄 Approving payment:', payment._id);
       
-      const response = await fetch(`${API_BASE_URL}/admin/approve-payment/${payment._id}`, {  // ✅ BASE_URL use করা হয়েছে
+      const response = await fetch(`${API_BASE_URL}/admin/approve-payment/${payment._id}`, {  // ✅ Vercel proxy use korbe
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
@@ -160,7 +160,7 @@ const Dashboard = ({ onSectionChange, onStatsUpdate }) => {
       setActionLoading(payment._id);
       console.log('🔄 Rejecting payment:', payment._id);
       
-      const response = await fetch(`${API_BASE_URL}/admin/reject-payment/${payment._id}`, {  // ✅ BASE_URL use করা হয়েছে
+      const response = await fetch(`${API_BASE_URL}/admin/reject-payment/${payment._id}`, {  // ✅ Vercel proxy use korbe
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',

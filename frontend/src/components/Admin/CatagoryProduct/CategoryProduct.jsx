@@ -2,8 +2,8 @@ import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import './CategoryProduct.css';
 
-// ✅ Base URL constant
-const BASE_URL = "http://13.236.52.33:5000";
+// ✅ Base URL constant - Vercel proxy use korbe
+const BASE_URL = ""; // Empty string for relative paths
 
 const CategoryProduct = ({ category, products, onEditProduct, onDeleteProduct }) => {
   const navigate = useNavigate();
@@ -25,9 +25,9 @@ const CategoryProduct = ({ category, products, onEditProduct, onDeleteProduct })
     ).join(' ');
   };
 
-  // ✅ FIXED: Correct image URL function with BASE_URL
+  // ✅ FIXED: Correct image URL function with Vercel proxy
   const getImageUrl = (imagePath) => {
-    if (!imagePath) return `${BASE_URL}/default-product.jpg`;
+    if (!imagePath) return '/api/default-product.jpg';
     
     // যদি imagePath already full URL হয়
     if (imagePath.startsWith('http')) {
@@ -36,11 +36,11 @@ const CategoryProduct = ({ category, products, onEditProduct, onDeleteProduct })
     
     // যদি imagePath relative path হয় (/uploads/filename.jpg)
     if (imagePath.startsWith('/uploads/')) {
-      return `${BASE_URL}${imagePath}`;  // ✅ BASE_URL use করা হয়েছে
+      return `/api${imagePath}`;  // ✅ Vercel proxy use korbe
     }
     
     // অন্য কোন case-এ default image
-    return `${BASE_URL}/default-product.jpg`;  // ✅ BASE_URL use করা হয়েছে
+    return '/api/default-product.jpg';  // ✅ Vercel proxy use korbe
   };
 
   return (
@@ -69,7 +69,7 @@ const CategoryProduct = ({ category, products, onEditProduct, onDeleteProduct })
                   alt={product.title || product.name}
                   onError={(e) => {
                     console.log('❌ Image failed to load:', product.image || product.imageUrl);
-                    e.target.src = `${BASE_URL}/default-product.jpg`;  // ✅ BASE_URL use করা হয়েছে
+                    e.target.src = '/api/default-product.jpg';  // ✅ Vercel proxy use korbe
                   }}
                 />
                 <div className="product-badge">

@@ -69,6 +69,19 @@ const AddFund = ({
     return phoneRegex.test(phone.replace(/\s+/g, ''));
   };
 
+  // ✅ FIXED: Dynamic API URL based on environment
+  const getApiBaseUrl = () => {
+    const currentHost = window.location.hostname;
+    
+    if (currentHost === 'game-store-two-pi.vercel.app') {
+      return 'https://metagamestore.duckdns.org';
+    } else if (currentHost === 'localhost') {
+      return 'http://localhost:5000';
+    } else {
+      return 'http://localhost:5000';
+    }
+  };
+
   // Handle balance add request
   const handleAddBalance = async (e) => {
     e.preventDefault();
@@ -118,7 +131,7 @@ const AddFund = ({
     setShowMathChallenge(true);
   };
 
-  // Handle math challenge submission - BACKEND API CALL
+  // ✅ FIXED: Handle math challenge submission with better API call
   const handleMathChallengeSubmit = async () => {
     if (!userMathAnswer.trim()) {
       setPaymentError('দয়া করে গাণিতিক প্রশ্নের উত্তর দিন!');
@@ -137,6 +150,7 @@ const AddFund = ({
 
     try {
       const amount = parseFloat(addAmount);
+      const API_BASE_URL = getApiBaseUrl();
       
       // Prepare payment data with user info
       const paymentData = {
@@ -152,13 +166,16 @@ const AddFund = ({
         },
         mathQuestion: mathQuestion,
         mathAnswer: mathAnswer,
-        userMathAnswer: userMathAnswer
+        userMathAnswer: userMathAnswer,
+        status: 'pending',
+        timestamp: new Date().toISOString()
       };
 
       console.log('💰 Payment Request Details:', paymentData);
+      console.log('🌐 API URL:', `${API_BASE_URL}/api/payments/create`);
 
-      // ✅ BACKEND API CALL - MongoDB-তে data save করবে
-      const response = await fetch('https://metagamestore.duckdns.org/api/payments/create', {
+      // ✅ FIXED: Better API call with error handling
+      const response = await fetch(`${API_BASE_URL}/api/payments/create`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -166,17 +183,30 @@ const AddFund = ({
         body: JSON.stringify(paymentData)
       });
 
-      const result = await response.json();
-
-      if (!response.ok || !result.success) {
-        throw new Error(result.message || 'পেমেন্ট সাবমিট করতে সমস্যা হয়েছে');
+      // ✅ Check if response is OK
+      if (!response.ok) {
+        const errorText = await response.text();
+        console.error('❌ Server error response:', errorText);
+        throw new Error(`Server error: ${response.status} ${response.statusText}`);
       }
 
+      const result = await response.json();
       console.log('✅ Backend Response:', result);
+
+      if (!result.success) {
+        throw new Error(result.message || 'পেমেন্ট সাবমিট করতে সমস্যা হয়েছে');
+      }
 
       // ✅ Parent component-কে inform করো payment successful হয়েছে
       if (onAddPendingBalance) {
         onAddPendingBalance(paymentData);
+      }
+
+      // ✅ Balance update করো
+      if (onBalanceUpdate) {
+        onBalanceUpdate({
+          pendingBalance: (pendingBalance || 0) + amount
+        });
       }
 
       // Success message
@@ -191,7 +221,15 @@ const AddFund = ({
       
     } catch (error) {
       console.error('❌ Payment error:', error);
-      setPaymentError(error.message || 'পেমেন্ট সাবমিট করতে সমস্যা হয়েছে। আবার চেষ্টা করুন।');
+      
+      // ✅ Better error messages based on error type
+      if (error.message.includes('Failed to fetch')) {
+        setPaymentError('বেকেন্ড সার্ভারে কানেক্ট হতে পারছি না। দয়া করে আবার চেষ্টা করুন।');
+      } else if (error.message.includes('Server error')) {
+        setPaymentError('সার্ভারে সমস্যা হচ্ছে। দয়া করে কিছুক্ষণ পর আবার চেষ্টা করুন।');
+      } else {
+        setPaymentError(error.message || 'পেমেন্ট সাবমিট করতে সমস্যা হয়েছে। আবার চেষ্টা করুন।');
+      }
     } finally {
       setPaymentLoading(false);
     }
@@ -236,7 +274,6 @@ const AddFund = ({
             <DollarSign size={24} className="balance-icon" />
             <div className="balance-info">
               <h4>এভেইলেবল ব্যালেন্স</h4>
-              {/* ✅ Dashboard থেকে আসা current balance */}
               <div className="balance-amount">৳ {currentBalance?.toFixed(2) || '0.00'}</div>
             </div>
           </div>
@@ -251,7 +288,6 @@ const AddFund = ({
             <Clock size={24} className="balance-icon" />
             <div className="balance-info">
               <h4>পেন্ডিং ব্যালেন্স</h4>
-              {/* ✅ Dashboard থেকে আসা pending balance */}
               <div className="balance-amount">৳ {pendingBalance?.toFixed(2) || '0.00'}</div>
             </div>
           </div>
@@ -261,7 +297,6 @@ const AddFund = ({
         </div>
       </div>
 
-      {/* Rest of your component remains the same */}
       {/* Math Challenge Modal */}
       {showMathChallenge && (
         <div className="math-challenge-modal">

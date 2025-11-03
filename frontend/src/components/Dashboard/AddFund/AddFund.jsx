@@ -96,21 +96,12 @@ const AddFund = ({
       return;
     }
 
-    if (!transactionId.trim()) {
-      setPaymentError('দয়া করে bKash ট্রানজেকশন আইডি দিন!');
-      return;
-    }
 
     if (!senderNumber.trim()) {
       setPaymentError('দয়া করে আপনার bKash নম্বর দিন!');
       return;
     }
 
-    // Validate transaction ID
-    if (!validateTransactionId(transactionId)) {
-      setPaymentError('ট্রানজেকশন আইডি সঠিক নয়! সঠিক ট্রানজেকশন আইডি দিন (সাধারণত C দিয়ে শুরু)');
-      return;
-    }
 
     // Validate phone number
     if (!validatePhoneNumber(senderNumber)) {
@@ -392,7 +383,7 @@ const AddFund = ({
                 setSuccessMessage('');
               }}
               min="10"
-              step="100"
+              // step="100"
               required
               disabled={paymentLoading}
               className="amount-input"

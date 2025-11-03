@@ -3,29 +3,55 @@ import { useNavigate } from 'react-router-dom';
 import { useProducts } from '../../hooks/useProducts';
 import './Subscriptions.css';
 
-// ✅ BASE_URL change করুন - Vercel proxy use করুন
-const BASE_URL = ""; // Empty string for relative paths
-
 const Subscriptions = () => {
   const navigate = useNavigate();
   const { products, loading, error } = useProducts('subscription');
 
-  // Image URL handle করার function
+  // ✅ FIXED: Improved image URL handling for Vercel
   const getImageUrl = (imgPath) => {
-    if (!imgPath) return 'https://via.placeholder.com/100x100/667eea/ffffff?text=SUB';
+    console.log('Image Path:', imgPath); // Debugging
     
+    if (!imgPath) {
+      return 'https://via.placeholder.com/200x200/667eea/ffffff?text=GAME+SUB';
+    }
+    
+    // যদি image URL ইতিমধ্যে full URL হয়
     if (imgPath.startsWith('http')) {
       return imgPath;
     }
     
+    // ✅ Vercel proxy through image load - FIXED PATH
     if (imgPath.startsWith('/uploads/')) {
-      return `/api${imgPath}`;  // ✅ Vercel proxy use করুন
+      // এটি কাজ করবে: /api/uploads/filename.jpg → http://13.236.52.33:5000/uploads/filename.jpg
+      return `/api${imgPath}`;
     }
     
-    return 'https://via.placeholder.com/100x100/667eea/ffffff?text=SUB';
+    // ✅ যদি image path /images/ দিয়ে শুরু হয়
+    if (imgPath.startsWith('/images/')) {
+      return imgPath;
+    }
+    
+    // ✅ যদি শুধু filename থাকে (without path)
+    if (imgPath.includes('.')) {
+      return `/api/uploads/${imgPath}`;
+    }
+    
+    return 'https://via.placeholder.com/200x200/667eea/ffffff?text=GAME+SUB';
   };
 
-  // ✅ UPDATE: Handle item click - navigate to checkout page
+  // ✅ Debugging: products load হলে check করুন
+  React.useEffect(() => {
+    if (products && products.length > 0) {
+      console.log('Products with image URLs:', 
+        products.map(p => ({
+          title: p.title,
+          originalImage: p.image,
+          resolvedUrl: getImageUrl(p.image)
+        }))
+      );
+    }
+  }, [products]);
+
   const handleItemClick = (product) => {
     navigate(`/checkout/${product._id || product.id}`, {
       state: {
@@ -98,8 +124,14 @@ const Subscriptions = () => {
                     src={getImageUrl(product.image || product.imageUrl)} 
                     alt={product.title || product.name}
                     onError={(e) => {
-                      e.target.src = 'https://via.placeholder.com/100x100/667eea/ffffff?text=SUB';
+                      console.error('Image failed to load:', e.target.src);
+                      e.target.src = 'https://via.placeholder.com/200x200/667eea/ffffff?text=IMAGE+ERROR';
+                      e.target.style.opacity = '0.7';
                     }}
+                    onLoad={(e) => {
+                      console.log('Image loaded successfully:', product.title);
+                    }}
+                    loading="lazy"
                   />
                 </div>
                 <div className="card-info-horizontal">
@@ -111,9 +143,7 @@ const Subscriptions = () => {
                     {product.price ? `৳ ${product.price}` : '৳ 199 - ৳ 999'}
                   </div>
                 </div>
-                
               </div>
-              
             </div>
           ))
         )}

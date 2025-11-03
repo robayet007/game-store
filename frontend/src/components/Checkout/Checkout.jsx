@@ -5,7 +5,7 @@ import { Minus, Plus, Wallet } from 'lucide-react';
 import styles from './Checkout.module.css';
 
 // Base URL constant
-const BASE_URL = "https://noncompoundable-unconstruable-karyn.ngrok-free.dev";
+const BASE_URL = "http://13.236.52.33:5000";
 
 const Checkout = ({ user }) => {
   const { id } = useParams();

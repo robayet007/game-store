@@ -1,7 +1,7 @@
 import axios from 'axios';
 
 const API = axios.create({
-  baseURL: 'https://noncompoundable-unconstruable-karyn.ngrok-free.dev/api',  // ✅ Changed to your live server
+  baseURL: 'http://13.236.52.33:5000/api',  // ✅ Changed to your live server
 });
 
 // ✅ Add request interceptor for better error handling

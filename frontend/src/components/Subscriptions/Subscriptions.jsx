@@ -4,7 +4,7 @@ import { useProducts } from '../../hooks/useProducts';
 import './Subscriptions.css';
 
 // ✅ Base URL constant
-const BASE_URL = "https://noncompoundable-unconstruable-karyn.ngrok-free.dev";
+const BASE_URL = "http://13.236.52.33:5000";
 
 const Subscriptions = () => {
   const navigate = useNavigate();

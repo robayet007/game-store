@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import './CategoryProduct.css';
 
 // ✅ Base URL constant
-const BASE_URL = "https://noncompoundable-unconstruable-karyn.ngrok-free.dev";
+const BASE_URL = "http://13.236.52.33:5000";
 
 const CategoryProduct = ({ category, products, onEditProduct, onDeleteProduct }) => {
   const navigate = useNavigate();

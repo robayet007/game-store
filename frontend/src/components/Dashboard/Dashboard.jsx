@@ -29,7 +29,7 @@ import AddFund from './AddFund/AddFund';
 import './Dashboard.css';
 
 // ✅ Base URL constant
-const BASE_URL = "https://noncompoundable-unconstruable-karyn.ngrok-free.dev";
+const BASE_URL = "http://13.236.52.33:5000";
 const API_BASE_URL = `${BASE_URL}/api`;
 
 const Dashboard = () => {

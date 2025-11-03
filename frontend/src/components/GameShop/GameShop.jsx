@@ -5,9 +5,6 @@ import { useNavigate } from 'react-router-dom';
 import { useProducts } from '../../hooks/useProducts';
 import "./GameShop.css";
 
-// ✅ BASE_URL change করুন - Vercel proxy use করুন
-const BASE_URL = ""; // Empty string for relative paths
-
 const categories = ["All", "Battle Royale", "FPS", "MOBA", "Sports", "Strategy", "RPG"];
 
 function GameShop() {
@@ -24,23 +21,39 @@ function GameShop() {
     return matchesCategory && matchesSearch;
   });
 
-  // ✅ Image URL handler function - Updated for Vercel
+  // ✅ FIXED: Image URL handler - No /api prefix needed
   const getImageUrl = (imgPath) => {
-    if (!imgPath) return 'https://images.unsplash.com/photo-1550745165-9bc0b252726f?w=400&h=300&fit=crop';
+    if (!imgPath) {
+      return 'https://images.unsplash.com/photo-1550745165-9bc0b252726f?w=400&h=300&fit=crop';
+    }
     
+    // Already full URL
     if (imgPath.startsWith('http')) {
       return imgPath;
     }
     
+    // ✅ FIXED: Just return the path, vercel.json handles the proxy
     if (imgPath.startsWith('/uploads/')) {
-      // ✅ Vercel proxy এর মাধ্যমে image serve হবে
-      return `/api${imgPath}`;  // Changed to use Vercel proxy
+      return imgPath; // Remove /api prefix
     }
     
+    // If only filename
+    if (imgPath.includes('.') && !imgPath.startsWith('/')) {
+      return `/uploads/${imgPath}`;
+    }
+    
+    // Fallback
     return 'https://images.unsplash.com/photo-1550745165-9bc0b252726f?w=400&h=300&fit=crop';
   };
 
-  // ✅ UPDATE: Handle card click - navigate to game details page
+  // ✅ Better image error handling
+  const handleImageError = (e, gameName) => {
+    console.error(`Image failed to load for: ${gameName}`, e.target.src);
+    e.target.src = 'https://images.unsplash.com/photo-1550745165-9bc0b252726f?w=400&h=300&fit=crop';
+    e.target.style.opacity = '0.8';
+  };
+
+  // Handle card click - navigate to game details page
   const handleCardClick = (game) => {
     navigate(`/game/${game._id || game.id}`, {
       state: {
@@ -161,9 +174,8 @@ function GameShop() {
                   alt={game.title || game.name}
                   className="game-image"
                   loading="lazy"
-                  onError={(e) => {
-                    e.target.src = 'https://images.unsplash.com/photo-1550745165-9bc0b252726f?w=400&h=300&fit=crop';
-                  }}
+                  onError={(e) => handleImageError(e, game.title || game.name)}
+                  style={{ transition: 'opacity 0.3s ease' }}
                 />
                 <div className="game-overlay">
                   <span className="game-category">{game.category || "Game"}</span>

@@ -391,20 +391,20 @@ const AddFund = ({
                 setPaymentError('');
                 setSuccessMessage('');
               }}
-              min="1000"
+              min="10"
               step="100"
               required
               disabled={paymentLoading}
               className="amount-input"
             />
-            <small>ন্যূনতম ১০০০ টাকা যোগ করতে হবে</small>
+            <small>ন্যূনতম ১০ টাকা যোগ করতে হবে</small>
           </div>
 
           <div className="form-group">
             <label>আপনার bKash নম্বর</label>
             <input 
               type="tel" 
-              placeholder="আপনার bKash নম্বর (যেমন: 01712345678)"
+              placeholder="আপনার bKash নম্বর (যেমন: 017xxxxxx)"
               value={senderNumber}
               onChange={(e) => {
                 setSenderNumber(e.target.value);
@@ -426,7 +426,7 @@ const AddFund = ({
             </small>
           </div>
 
-          <div className="form-group">
+          {/* <div className="form-group">
             <label>bKash ট্রানজেকশন আইডি</label>
             <input 
               type="text" 
@@ -450,7 +450,7 @@ const AddFund = ({
                 ? '⚠️ ট্রানজেকশন আইডি সঠিক নয় (সাধারণত C দিয়ে শুরু হয়)' 
                 : 'Money Send করার পর যে Trx ID পাবেন (যেমন: C6A8B9X2)'}
             </small>
-          </div>
+          </div> */}
           
           <button 
             type="submit" 
@@ -478,20 +478,13 @@ const AddFund = ({
             <li>উপরে অ্যামাউন্ট সিলেক্ট করুন</li>
             <li><strong>bKash App এ গিয়ে 01766325020 নম্বরে মানি সেন্ড করুন</strong></li>
             <li>আপনার bKash নম্বর দিন</li>
-            <li>ট্রানজেকশন আইডি কপি করে এখানে পেস্ট করুন (যেমন: C6A8B9X2)</li>
+            {/* <li>ট্রানজেকশন আইডি কপি করে এখানে পেস্ট করুন (যেমন: C6A8B9X2)</li> */}
             <li>গাণিতিক প্রশ্নের উত্তর দিন (যেমন: 8 + 8 = 16)</li>
             <li>ভেরিফাই করুন - অ্যামাউন্ট পেন্ডিং ব্যালেন্সে যোগ হবে</li>
             <li>অ্যাডমিন চেক করার পর ব্যালেন্স এভেইলেবল হবে</li>
           </ol>
           
           <div className="important-note">
-            <strong>গুরুত্বপূর্ণ:</strong> 
-            <ul>
-              <li>ট্রানজেকশন আইডি সঠিকভাবে দিন (সাধারণত C দিয়ে শুরু)</li>
-              <li>আপনার bKash নম্বর সঠিকভাবে দিন</li>
-              <li>গাণিতিক প্রশ্নের উত্তর সঠিকভাবে দিন</li>
-              <li>অ্যাডমিন ভেরিফাই করার পরই ব্যালেন্স এভেইলেবল হবে</li>
-            </ul>
           </div>
         </div>
       </div>

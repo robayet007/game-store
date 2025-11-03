@@ -370,7 +370,6 @@ const AddFund = ({
                 setSuccessMessage('');
               }}
               min="10"
-              step="100"
               required
               disabled={paymentLoading}
               className="amount-input"

@@ -11,6 +11,7 @@ const AddFund = ({
   onBalanceUpdate
 }) => {
   const [addAmount, setAddAmount] = useState('');
+  // const [transactionId, setTransactionId] = useState('');
   const [senderNumber, setSenderNumber] = useState('');
   const [paymentLoading, setPaymentLoading] = useState(false);
   const [paymentError, setPaymentError] = useState('');
@@ -53,6 +54,14 @@ const AddFund = ({
     return { question, answer };
   };
 
+  // Validate transaction ID
+  const validateTransactionId = (trxId) => {
+    if (!trxId.trim()) return false;
+    const trimmedTrx = trxId.trim().toUpperCase();
+    const trxRegex = /^[A-Z][A-Z0-9]{5,}$/;
+    return trxRegex.test(trimmedTrx);
+  };
+
   // Validate phone number
   const validatePhoneNumber = (phone) => {
     if (!phone.trim()) return false;
@@ -82,13 +91,24 @@ const AddFund = ({
       return;
     }
 
-    if (amount < 10) { // Minimum amount 10 taka
-      setPaymentError('ন্যূনতম ১০ টাকা যোগ করতে হবে!');
+    if (amount < 1000) {
+      setPaymentError('ন্যূনতম ১০০০ টাকা যোগ করতে হবে!');
+      return;
+    }
+
+    if (!transactionId.trim()) {
+      setPaymentError('দয়া করে bKash ট্রানজেকশন আইডি দিন!');
       return;
     }
 
     if (!senderNumber.trim()) {
       setPaymentError('দয়া করে আপনার bKash নম্বর দিন!');
+      return;
+    }
+
+    // Validate transaction ID
+    if (!validateTransactionId(transactionId)) {
+      setPaymentError('ট্রানজেকশন আইডি সঠিক নয়! সঠিক ট্রানজেকশন আইডি দিন (সাধারণত C দিয়ে শুরু)');
       return;
     }
 
@@ -124,9 +144,10 @@ const AddFund = ({
       const amount = parseFloat(addAmount);
       const API_BASE_URL = getApiBaseUrl();
       
-      // Prepare payment data with user info (TRX ID removed)
+      // Prepare payment data with user info
       const paymentData = {
         amount: amount,
+        // transactionId: transactionId.toUpperCase().trim(),
         senderNumber: senderNumber.trim(),
         userBkashNumber: userBkashNumber || '01766325020',
         user: {
@@ -143,7 +164,7 @@ const AddFund = ({
       };
 
       console.log('💰 Payment Request Details:', paymentData);
-      console.log('🌐 API URL:', `${API_BASE_URL}/payments/create`);
+      console.log('🌐 API URL:', `${API_BASE_URL}/payments/create`); // ✅ Path change
 
       // ✅ FIXED: Use Vercel proxy API call
       const response = await fetch(`${API_BASE_URL}/payments/create`, {
@@ -185,6 +206,7 @@ const AddFund = ({
       
       // Reset form
       setAddAmount('');
+      // setTransactionId('');
       setSenderNumber('');
       setUserMathAnswer('');
       setShowMathChallenge(false);
@@ -370,6 +392,7 @@ const AddFund = ({
                 setSuccessMessage('');
               }}
               min="10"
+              step="100"
               required
               disabled={paymentLoading}
               className="amount-input"
@@ -402,11 +425,37 @@ const AddFund = ({
                 : 'আপনার bKash নম্বর যেখান থেকে টাকা পাঠাবেন'}
             </small>
           </div>
+
+          {/* <div className="form-group">
+            <label>bKash ট্রানজেকশন আইডি</label>
+            <input 
+              type="text" 
+              placeholder="bKash Trx ID (যেমন: C6A8B9X2)"
+              value={transactionId}
+              onChange={(e) => {
+                setTransactionId(e.target.value);
+                setPaymentError('');
+                setSuccessMessage('');
+              }}
+              required
+              disabled={paymentLoading}
+              className="trx-input"
+              style={{
+                borderColor: transactionId && !validateTransactionId(transactionId) ? '#dc3545' : '#d1d5db',
+                color: transactionId && !validateTransactionId(transactionId) ? '#dc3545' : '#1a1a1a'
+              }}
+            />
+            <small>
+              {transactionId && !validateTransactionId(transactionId) 
+                ? '⚠️ ট্রানজেকশন আইডি সঠিক নয় (সাধারণত C দিয়ে শুরু হয়)' 
+                : 'Money Send করার পর যে Trx ID পাবেন (যেমন: C6A8B9X2)'}
+            </small>
+          </div> */}
           
           <button 
             type="submit" 
             className="add-balance-btn"
-            disabled={paymentLoading || !addAmount || !senderNumber || parseFloat(addAmount) < 10 || !validatePhoneNumber(senderNumber)}
+            disabled={paymentLoading || !addAmount  || !senderNumber || parseFloat(addAmount) < 1000  || !validatePhoneNumber(senderNumber)}
           >
             {paymentLoading ? (
               <>
@@ -429,13 +478,13 @@ const AddFund = ({
             <li>উপরে অ্যামাউন্ট সিলেক্ট করুন</li>
             <li><strong>bKash App এ গিয়ে 01766325020 নম্বরে মানি সেন্ড করুন</strong></li>
             <li>আপনার bKash নম্বর দিন</li>
+            {/* <li>ট্রানজেকশন আইডি কপি করে এখানে পেস্ট করুন (যেমন: C6A8B9X2)</li> */}
             <li>গাণিতিক প্রশ্নের উত্তর দিন (যেমন: 8 + 8 = 16)</li>
             <li>ভেরিফাই করুন - অ্যামাউন্ট পেন্ডিং ব্যালেন্সে যোগ হবে</li>
             <li>অ্যাডমিন চেক করার পর ব্যালেন্স এভেইলেবল হবে</li>
           </ol>
           
           <div className="important-note">
-            <strong>মনে রাখবেন:</strong> টাকা পাঠানোর পর শুধু আপনার bKash নম্বর এবং অ্যামাউন্ট দিন। অ্যাডমিন ম্যানুয়ালি চেক করে ব্যালেন্স এড করবেন।
           </div>
         </div>
       </div>
@@ -443,4 +492,4 @@ const AddFund = ({
   );
 };
 
-export default AddFund;
+export default AddFund; 

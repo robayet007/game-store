@@ -1,8 +1,8 @@
 import { useState, useEffect } from 'react';
 
-// ✅ Base URL constant
-const BASE_URL = "http://3.24.182.94:5000";
-const API_BASE_URL = `${BASE_URL}/api`;
+// ✅ BASE_URL change করুন - Vercel proxy use করুন
+const BASE_URL = ""; // Empty string for relative paths
+const API_BASE_URL = "/api"; // Direct API path for Vercel proxy
 
 export const useOrderHistory = (userId) => {
   const [orders, setOrders] = useState([]);
@@ -20,7 +20,7 @@ export const useOrderHistory = (userId) => {
       setError(null);
       
       const response = await fetch(
-        `${API_BASE_URL}/orders/user/${userId}?page=${page}&limit=${limit}`  // ✅ BASE_URL use করা হয়েছে
+        `${API_BASE_URL}/orders/user/${userId}?page=${page}&limit=${limit}`  // ✅ Vercel proxy use করা হয়েছে
       );
       
       if (!response.ok) {
@@ -49,7 +49,7 @@ export const useOrderHistory = (userId) => {
     
     try {
       const response = await fetch(
-        `${API_BASE_URL}/orders/user/${userId}/stats`  // ✅ BASE_URL use করা হয়েছে
+        `${API_BASE_URL}/orders/user/${userId}/stats`  // ✅ Vercel proxy use করা হয়েছে
       );
       
       if (!response.ok) {

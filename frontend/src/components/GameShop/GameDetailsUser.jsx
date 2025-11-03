@@ -39,7 +39,7 @@ const GameDetailsUser = () => {
   const getImageUrl = (imgPath) => {
     if (!imgPath) return 'https://via.placeholder.com/400x300/667eea/ffffff?text=Game+Image';
     if (imgPath.startsWith('http')) return imgPath;
-    if (imgPath.startsWith('/uploads/')) return `https://noncompoundable-unconstruable-karyn.ngrok-free.dev/${imgPath}`;  // ✅ Changed here
+    if (imgPath.startsWith('/uploads/')) return `/api${imgPath}`;  // ✅ Vercel proxy use করুন
     return 'https://via.placeholder.com/400x300/667eea/ffffff?text=Game+Image';
   };
 

@@ -3,8 +3,8 @@ import { useNavigate } from 'react-router-dom';
 import { useProducts } from '../../hooks/useProducts';
 import './Subscriptions.css';
 
-// ✅ Base URL constant
-const BASE_URL = "http://13.236.52.33:5000";
+// ✅ BASE_URL change করুন - Vercel proxy use করুন
+const BASE_URL = ""; // Empty string for relative paths
 
 const Subscriptions = () => {
   const navigate = useNavigate();
@@ -19,7 +19,7 @@ const Subscriptions = () => {
     }
     
     if (imgPath.startsWith('/uploads/')) {
-      return `${BASE_URL}${imgPath}`;  // ✅ BASE_URL use করা হয়েছে
+      return `/api${imgPath}`;  // ✅ Vercel proxy use করুন
     }
     
     return 'https://via.placeholder.com/100x100/667eea/ffffff?text=SUB';

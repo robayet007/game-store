@@ -1,8 +1,8 @@
 import { useNavigate } from 'react-router-dom';
 import "./Offers.css"
 
-// ✅ Base URL constant
-const BASE_URL = "https://noncompoundable-unconstruable-karyn.ngrok-free.dev";
+// ✅ BASE_URL change করুন - Vercel proxy use করুন
+const BASE_URL = ""; // Empty string for relative paths
 
 const OfferCard = ({ product }) => {
   const navigate = useNavigate();
@@ -33,7 +33,7 @@ const OfferCard = ({ product }) => {
     }
     
     if (imgPath.startsWith('/uploads/')) {
-      return `${BASE_URL}${imgPath}`;  // ✅ BASE_URL use করা হয়েছে
+      return `/api${imgPath}`;  // ✅ Vercel proxy use করুন
     }
     
     return 'https://i.pinimg.com/736x/53/12/73/5312738a7102a3edb2728eea63f636de.jpg';

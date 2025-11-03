@@ -63,21 +63,21 @@ function GameShop() {
   };
 
   // Handle "Top Up Now" button click - navigate to checkout
-  const handleTopUpClick = (game, e) => {
-    e.stopPropagation(); // Prevent card click event
-    navigate(`/checkout/${game._id || game.id}`, {
-      state: {
-        product: {
-          id: game._id || game.id,
-          title: game.title || game.name,
-          image: getImageUrl(game.image || game.imageUrl),
-          category: game.category || "Game",
-          price: game.price || 0,
-          description: game.description || "Game top-up service"
-        }
-      }
-    });
-  };
+  // const handleTopUpClick = (game, e) => {
+  //   e.stopPropagation(); // Prevent card click event
+  //   navigate(`/checkout/${game._id || game.id}`, {
+  //     state: {
+  //       product: {
+  //         id: game._id || game.id,
+  //         title: game.title || game.name,
+  //         image: getImageUrl(game.image || game.imageUrl),
+  //         category: game.category || "Game",
+  //         price: game.price || 0,
+  //         description: game.description || "Game top-up service"
+  //       }
+  //     }
+  //   });
+  // };
 
   // Handle "Details" button click - navigate to game details page
   const handleDetailsClick = (game, e) => {

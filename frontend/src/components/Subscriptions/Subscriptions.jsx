@@ -8,45 +8,31 @@ const Subscriptions = () => {
   const { products, loading, error } = useProducts('subscription');
 
   // ✅ FIXED: Better image URL handling with working fallbacks
-  const getImageUrl = (imgPath) => {
-    console.log('Original Image Path:', imgPath);
-    
-    if (!imgPath) {
-      // ✅ Use a reliable fallback image service
-      return 'https://images.unsplash.com/photo-1550745165-9bc0b252726f?w=200&h=200&fit=crop&crop=center';
-    }
-    
-    // যদি image URL ইতিমধ্যে full URL হয়
-    if (imgPath.startsWith('http')) {
-      return imgPath;
-    }
-    
-    // ✅ Vercel proxy through image load
-    if (imgPath.startsWith('/uploads/')) {
-      return `/api${imgPath}`;
-    }
-    
-    // ✅ যদি image path /images/ দিয়ে শুরু হয়
-    if (imgPath.startsWith('/images/')) {
-      return imgPath;
-    }
-    
-    // ✅ যদি শুধু filename থাকে (without path)
-    if (imgPath.includes('.') && !imgPath.startsWith('/')) {
-      return `/api/uploads/${imgPath}`;
-    }
-    
-    // ✅ Reliable fallback images from Unsplash
-    const fallbackImages = [
-      'https://images.unsplash.com/photo-1550745165-9bc0b252726f?w=200&h=200&fit=crop&crop=center', // Gaming 1
-      'https://images.unsplash.com/photo-1542751371-adc38448a05e?w=200&h=200&fit=crop&crop=center', // Gaming 2
-      'https://images.unsplash.com/photo-1593305841991-05c297ba4575?w=200&h=200&fit=crop&crop=center', // Gaming 3
-      'https://images.unsplash.com/photo-1511512578047-dfb367046420?w=200&h=200&fit=crop&crop=center', // Gaming 4
-    ];
-    
-    const randomIndex = Math.floor(Math.random() * fallbackImages.length);
-    return fallbackImages[randomIndex];
-  };
+ const getImageUrl = (imgPath) => {
+  console.log('Original Image Path:', imgPath);
+  
+  if (!imgPath) {
+    return 'https://images.unsplash.com/photo-1550745165-9bc0b252726f?w=200&h=200&fit=crop';
+  }
+  
+  // যদি already full URL হয়
+  if (imgPath.startsWith('http')) {
+    return imgPath;
+  }
+  
+  // ✅ যদি /uploads/ দিয়ে শুরু হয় (Vercel এখন proxy করবে)
+  if (imgPath.startsWith('/uploads/')) {
+    return imgPath; // Just return as is
+  }
+  
+  // ✅ যদি শুধু filename থাকে
+  if (imgPath.includes('.') && !imgPath.startsWith('/')) {
+    return `/uploads/${imgPath}`;
+  }
+  
+  // Fallback
+  return 'https://images.unsplash.com/photo-1550745165-9bc0b252726f?w=200&h=200&fit=crop';
+};
 
   // ✅ Improved error handling for images
   const handleImageError = (e, productTitle) => {

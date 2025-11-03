@@ -5,8 +5,23 @@
       "destination": "http://13.236.52.33:5000/api/:path*"
     },
     {
+      "source": "/uploads/:path*",
+      "destination": "http://13.236.52.33:5000/uploads/:path*"
+    },
+    {
       "source": "/(.*)",
       "destination": "/index.html"
+    }
+  ],
+  "headers": [
+    {
+      "source": "/uploads/(.*)",
+      "headers": [
+        {
+          "key": "Cache-Control",
+          "value": "public, max-age=31536000, immutable"
+        }
+      ]
     }
   ]
 }

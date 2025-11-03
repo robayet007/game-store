@@ -26,10 +26,9 @@ import {
 import { auth } from '../../firebaseConfig';
 import { usePayment } from '../../hooks/usePayment';
 import AddFund from './AddFund/AddFund';
-import styles from './Dashboard.module.css'; // ✅ CSS Module import
+import './Dashboard.css';
 
-// ✅ BASE_URL change করুন - Vercel proxy use করুন
-const BASE_URL = ""; // Empty string for relative paths
+// ✅ FIXED: Remove unnecessary BASE_URL
 const API_BASE_URL = "/api"; // Direct API path for Vercel proxy
 
 const Dashboard = () => {
@@ -155,22 +154,22 @@ const Dashboard = () => {
     }
   };
 
-  // ✅ যখন payment successful হয়, তখন balance refresh করো
+  // ✅ যখন payment successful হয়, তখন balance refresh করো
   const handleAddPendingBalance = (paymentData) => {
     console.log('✅ Payment added to pending:', paymentData);
     refreshAllData();
   };
 
-  // Get product image based on product name and category
+  // ✅ FIXED: Get product image - proper URL handling
   const getProductImage = (productName, category) => {
     const gameImages = {
-      'free fire': `/api/images/free-fire.jpg`,
-      'pubg': `/api/images/pubg.jpg`,
-      'mobile legends': `/api/images/mlbb.jpg`,
-      'cod': `/api/images/cod.jpg`,
-      'netflix': `/api/images/netflix.jpg`,
-      'spotify': `/api/images/spotify.jpg`,
-      'youtube': `/api/images/youtube.jpg`
+      'free fire': `/images/free-fire.jpg`,
+      'pubg': `/images/pubg.jpg`,
+      'mobile legends': `/images/mlbb.jpg`,
+      'cod': `/images/cod.jpg`,
+      'netflix': `/images/netflix.jpg`,
+      'spotify': `/images/spotify.jpg`,
+      'youtube': `/images/youtube.jpg`
     };
 
     const productKey = productName.toLowerCase();
@@ -182,13 +181,20 @@ const Dashboard = () => {
 
     // Default images based on category
     const categoryImages = {
-      'game-topup': `/api/images/game-default.jpg`,
-      'subscription': `/api/images/subscription-default.jpg`,
-      'special-offers': `/api/images/special-offer.jpg`,
-      'default': `/api/images/product-default.jpg`
+      'game-topup': `/images/game-default.jpg`,
+      'subscription': `/images/subscription-default.jpg`,
+      'special-offers': `/images/special-offer.jpg`,
+      'default': `/images/product-default.jpg`
     };
 
     return categoryImages[category] || categoryImages.default;
+  };
+
+  // ✅ FIXED: Image error handler
+  const handleImageError = (e, productName) => {
+    console.error(`Image failed to load for: ${productName}`, e.target.src);
+    e.target.src = '/images/product-default.jpg';
+    e.target.style.opacity = '0.8';
   };
 
   // Get status configuration
@@ -196,22 +202,22 @@ const Dashboard = () => {
     const configs = {
       'completed': { 
         icon: <Truck size={16} />, 
-        color: styles.statusDelivered,
+        color: 'status-delivered',
         text: 'Delivered'
       },
       'pending': { 
         icon: <Clock size={16} />, 
-        color: styles.statusPending,
+        color: 'status-pending',
         text: 'Processing' 
       },
       'failed': { 
         icon: <XCircle size={16} />, 
-        color: styles.statusCancelled,
+        color: 'status-cancelled',
         text: 'Failed' 
       },
       'default': { 
         icon: <Package size={16} />, 
-        color: styles.statusDefault,
+        color: 'status-default',
         text: 'Processing' 
       }
     };
@@ -304,21 +310,21 @@ const Dashboard = () => {
   // Render order history section
   const renderOrderHistory = () => {
     if (ordersLoading) {
-      return <div className={styles.loading}>Loading order history...</div>;
+      return <div className="loading">Loading order history...</div>;
     }
 
     if (ordersError) {
-      return <div className={styles.errorMessage}>Error loading orders: {ordersError}</div>;
+      return <div className="error-message">Error loading orders: {ordersError}</div>;
     }
 
     if (!orders || orders.length === 0) {
       return (
-        <div className={styles.emptyOrders}>
-          <Package size={48} className={styles.emptyIcon} />
+        <div className="empty-orders">
+          <Package size={48} className="empty-icon" />
           <h3>No Orders Yet</h3>
           <p>Your order history will appear here once you make your first purchase.</p>
           <button 
-            className={styles.shopNowBtn}
+            className="shop-now-btn"
             onClick={() => navigate('/shop')}
           >
             Start Shopping
@@ -328,64 +334,64 @@ const Dashboard = () => {
     }
 
     return (
-      <div className={styles.ordersSection}>
-        <div className={styles.sectionHeader}>
+      <div className="orders-section">
+        <div className="section-header">
           <h3>Your Order History</h3>
-          <div className={styles.ordersSummary}>
+          <div className="orders-summary">
             <span>Total: {orderStats.totalOrders} orders</span>
             <span>Spent: ৳ {orderStats.totalSpent?.toFixed(2) || '0.00'}</span>
           </div>
         </div>
 
         {/* Order Statistics */}
-        <div className={styles.ordersStats}>
-          <div className={styles.statCard}>
-            <div className={styles.statNumber}>{orderStats.totalOrders}</div>
-            <div className={styles.statLabel}>Total Orders</div>
+        <div className="orders-stats">
+          <div className="stat-card">
+            <div className="stat-number">{orderStats.totalOrders}</div>
+            <div className="stat-label">Total Orders</div>
           </div>
-          <div className={styles.statCard}>
-            <div className={styles.statNumber}>{orderStats.completedOrders}</div>
-            <div className={styles.statLabel}>Completed</div>
+          <div className="stat-card">
+            <div className="stat-number">{orderStats.completedOrders}</div>
+            <div className="stat-label">Completed</div>
           </div>
-          <div className={styles.statCard}>
-            <div className={styles.statNumber}>{orderStats.pendingOrders}</div>
-            <div className={styles.statLabel}>Processing</div>
+          <div className="stat-card">
+            <div className="stat-number">{orderStats.pendingOrders}</div>
+            <div className="stat-label">Processing</div>
           </div>
-          <div className={styles.statCard}>
-            <div className={styles.statNumber}>৳ {orderStats.totalSpent?.toFixed(2) || '0.00'}</div>
-            <div className={styles.statLabel}>Total Spent</div>
+          <div className="stat-card">
+            <div className="stat-number">৳ {orderStats.totalSpent?.toFixed(2) || '0.00'}</div>
+            <div className="stat-label">Total Spent</div>
           </div>
         </div>
         
         {/* Orders Grid */}
-        <div className={styles.ordersGrid}>
+        <div className="orders-grid">
           {orders.map((order) => {
             const statusConfig = getStatusConfig(order.status);
             
             return (
-              <div key={order._id || order.orderId} className={styles.orderCard}>
-                <div className={styles.orderHeader}>
-                  <div className={styles.productImage}>
+              <div key={order._id || order.orderId} className="order-card">
+                <div className="order-header">
+                  <div className="product-image">
                     <img 
                       src={getProductImage(order.productName, order.category)}
                       alt={order.productName}
-                      onError={(e) => {
-                        e.target.src = `/api/images/product-default.jpg`;
-                      }}
+                      onError={(e) => handleImageError(e, order.productName)}
+                      loading="lazy"
+                      style={{ transition: 'opacity 0.3s ease' }}
                     />
                   </div>
-                  <div className={styles.orderGameInfo}>
-                    <span className={styles.orderGame}>{order.productName}</span>
-                    <span className={styles.orderId}>Order: {order.orderId}</span>
+                  <div className="order-game-info">
+                    <span className="order-game">{order.productName}</span>
+                    <span className="order-id">Order: {order.orderId}</span>
                   </div>
                 </div>
                 
-                <div className={styles.orderDetails}>
-                  <div className={styles.orderMeta}>
-                    <span className={styles.orderQuantity}>Qty: {order.quantity}</span>
-                    <span className={styles.orderPrice}>৳ {order.totalAmount}</span>
+                <div className="order-details">
+                  <div className="order-meta">
+                    <span className="order-quantity">Qty: {order.quantity}</span>
+                    <span className="order-price">৳ {order.totalAmount}</span>
                   </div>
-                  <span className={`${styles.orderStatus} ${statusConfig.color}`}>
+                  <span className={`order-status ${statusConfig.color}`}>
                     {statusConfig.icon}
                     {statusConfig.text}
                   </span>
@@ -393,28 +399,28 @@ const Dashboard = () => {
 
                 {/* Game Information (if available) */}
                 {(order.playerUID || order.gameUsername) && (
-                  <div className={styles.gameInfo}>
+                  <div className="game-info">
                     {order.playerUID && (
-                      <div className={styles.gameDetail}>
-                        <span className={styles.label}>Game UID:</span>
-                        <span className={styles.value}>{order.playerUID}</span>
+                      <div className="game-detail">
+                        <span className="label">Game UID:</span>
+                        <span className="value">{order.playerUID}</span>
                       </div>
                     )}
                     {order.gameUsername && (
-                      <div className={styles.gameDetail}>
-                        <span className={styles.label}>Username:</span>
-                        <span className={styles.value}>{order.gameUsername}</span>
+                      <div className="game-detail">
+                        <span className="label">Username:</span>
+                        <span className="value">{order.gameUsername}</span>
                       </div>
                     )}
                   </div>
                 )}
 
-                <div className={styles.orderFooter}>
-                  <div className={styles.orderDate}>
+                <div className="order-footer">
+                  <div className="order-date">
                     <Calendar size={14} />
                     {formatDate(order.purchaseDate)}
                   </div>
-                  <div className={styles.orderCategory}>
+                  <div className="order-category">
                     {order.category === 'game-topup' && '🎮 Game'}
                     {order.category === 'subscription' && '👑 Subscription'}
                     {order.category === 'special-offers' && '⭐ Special Offer'}
@@ -426,9 +432,9 @@ const Dashboard = () => {
         </div>
 
         {/* Refresh Button */}
-        <div className={styles.refreshSection}>
+        <div className="refresh-section">
           <button 
-            className={styles.refreshBtn}
+            className="refresh-btn"
             onClick={refreshOrderData}
             disabled={ordersLoading}
           >
@@ -441,7 +447,7 @@ const Dashboard = () => {
 
   const renderContent = () => {
     if (loading) {
-      return <div className={styles.loading}>Loading...</div>;
+      return <div className="loading">Loading...</div>;
     }
 
     switch (activeTab) {
@@ -450,7 +456,7 @@ const Dashboard = () => {
 
       case 'balance':
         return (
-          <div className={styles.balanceSection}>
+          <div className="balance-section">
             <AddFund 
               currentBalance={userBalance.availableBalance}
               pendingBalance={userBalance.pendingBalance}
@@ -462,17 +468,17 @@ const Dashboard = () => {
 
       case 'security':
         return (
-          <div className={styles.securitySection}>
+          <div className="security-section">
             <h3>Security Settings</h3>
             
             {user?.providerData?.[0]?.providerId === 'password' ? (
-              <div className={styles.changePassword}>
+              <div className="change-password">
                 <h4>Change Password</h4>
-                {passwordError && <div className={styles.errorMessage}>{passwordError}</div>}
-                {passwordSuccess && <div className={styles.successMessage}>{passwordSuccess}</div>}
+                {passwordError && <div className="error-message">{passwordError}</div>}
+                {passwordSuccess && <div className="success-message">{passwordSuccess}</div>}
                 
-                <form onSubmit={handlePasswordChange} className={styles.passwordForm}>
-                  <div className={styles.formGroup}>
+                <form onSubmit={handlePasswordChange} className="password-form">
+                  <div className="form-group">
                     <label>Current Password</label>
                     <input 
                       type="password" 
@@ -486,7 +492,7 @@ const Dashboard = () => {
                       disabled={passwordLoading}
                     />
                   </div>
-                  <div className={styles.formGroup}>
+                  <div className="form-group">
                     <label>New Password</label>
                     <input 
                       type="password" 
@@ -500,7 +506,7 @@ const Dashboard = () => {
                       disabled={passwordLoading}
                     />
                   </div>
-                  <div className={styles.formGroup}>
+                  <div className="form-group">
                     <label>Confirm New Password</label>
                     <input 
                       type="password" 
@@ -516,7 +522,7 @@ const Dashboard = () => {
                   </div>
                   <button 
                     type="submit" 
-                    className={styles.updateBtn}
+                    className="update-btn"
                     disabled={passwordLoading}
                   >
                     {passwordLoading ? 'Updating...' : 'Update Password'}
@@ -524,10 +530,10 @@ const Dashboard = () => {
                 </form>
               </div>
             ) : (
-              <div className={styles.socialLoginInfo}>
-                <div className={styles.infoCard}>
+              <div className="social-login-info">
+                <div className="info-card">
                   <Shield size={24} />
-                  <div className={styles.infoContent}>
+                  <div className="info-content">
                     <h4>Social Login Account</h4>
                     <p>You are logged in with {user?.providerData?.[0]?.providerId || 'social account'}. 
                     Password change is not available for social login accounts.</p>
@@ -541,85 +547,85 @@ const Dashboard = () => {
       case 'profile':
       default:
         return (
-          <div className={styles.profileSection}>
+          <div className="profile-section">
             <h3>Profile Information</h3>
-            <div className={styles.profileCard}>
-              <div className={styles.profileHeader}>
-                <div className={styles.userAvatarLarge}>
+            <div className="profile-card">
+              <div className="profile-header">
+                <div className="user-avatar-large">
                   {user?.photoURL ? (
                     <img 
                       src={user.photoURL} 
                       alt="Profile" 
-                      className={styles.profileImage}
+                      className="profile-image"
                     />
                   ) : (
                     <User size={32} />
                   )}
                 </div>
-                <div className={styles.profileInfoMain}>
-                  <h2 className={styles.userDisplayName}>
+                <div className="profile-info-main">
+                  <h2 className="user-display-name">
                     {user?.displayName || user?.email?.split('@')[0] || 'Gamer'}
                   </h2>
-                  <p className={styles.userRole}>PRO GAMER</p>
+                  <p className="user-role">PRO GAMER</p>
                 </div>
               </div>
               
-              <div className={styles.profileDetails}>
-                <div className={styles.detailItem}>
+              <div className="profile-details">
+                <div className="detail-item">
                   <Mail size={18} />
-                  <div className={styles.detailContent}>
+                  <div className="detail-content">
                     <label>Email Address</label>
                     <span>{user?.email || 'Not available'}</span>
                   </div>
                 </div>
                 
-                <div className={styles.detailItem}>
+                <div className="detail-item">
                   <User size={18} />
-                  <div className={styles.detailContent}>
+                  <div className="detail-content">
                     <label>Account Type</label>
-                    <span className={styles.accountType}>
+                    <span className="account-type">
                       {user?.providerData?.[0]?.providerId === 'password' ? 'Email/Password' : 'Social Login'}
                     </span>
                   </div>
                 </div>
                 
-                <div className={styles.detailItem}>
+                <div className="detail-item">
                   <Calendar size={18} />
-                  <div className={styles.detailContent}>
+                  <div className="detail-content">
                     <label>Member Since</label>
                     <span>{formatJoinDate()}</span>
                   </div>
                 </div>
                 
-                <div className={styles.detailItem}>
+                <div className="detail-item">
                   <DollarSign size={18} />
-                  <div className={styles.detailContent}>
+                  <div className="detail-content">
                     <label>Available Balance</label>
-                    <span className={styles.balanceAmountSmall}>৳ {userBalance.availableBalance?.toFixed(2) || '0.00'}</span>
+                    <span className="balance-amount-small">৳ {userBalance.availableBalance?.toFixed(2) || '0.00'}</span>
                   </div>
                 </div>
 
-                <div className={styles.detailItem}>
+                <div className="detail-item">
                   <Clock size={18} />
-                  <div className={styles.detailContent}>
+                  <div className="detail-content">
                     <label>Pending Balance</label>
-                    <span className={`${styles.balanceAmountSmall} ${styles.balanceAmountSmallPending}`}>৳ {userBalance.pendingBalance?.toFixed(2) || '0.00'}</span>
+                    <span className="balance-amount-small pending">৳ {userBalance.pendingBalance?.toFixed(2) || '0.00'}</span>
                   </div>
                 </div>
                 
-                <div className={styles.detailItem}>
+                <div className="detail-item">
                   <Package size={18} />
-                  <div className={styles.detailContent}>
+                  <div className="detail-content">
                     <label>Total Orders</label>
                     <span>{orderStats.totalOrders || 0}</span>
                   </div>
                 </div>
 
-                <div className={styles.detailItem}>
+                <div className="detail-item">
                   <DollarSign size={18} />
-                  <div className={styles.detailContent}>
+                  <div className="detail-content">
                     <label>Total Spent</label>
-                    <span className={styles.balanceAmountSmall}>
+                    <span className="balance-amount-small">
                       ৳ {orderStats.totalSpent?.toFixed(2) || '0.00'}
                     </span>
                   </div>
@@ -632,45 +638,45 @@ const Dashboard = () => {
   };
 
   if (loading) {
-    return <div className={styles.dashboardLoading}>Loading Dashboard...</div>;
+    return <div className="dashboard-loading">Loading Dashboard...</div>;
   }
 
   return (
-    <div className={styles.container}>
+    <div className="dashboard-container">
       {/* Header */}
-      <header className={styles.header}>
-        <div className={styles.headerContent}>
-          <button onClick={handleGoHome} className={styles.homeBtn}>
+      <header className="dashboard-header">
+        <div className="header-content">
+          <button onClick={handleGoHome} className="home-btn">
             <Home size={24} />
           </button>
-          <div className={styles.userProfile}>
-            <div className={styles.userAvatar}>
+          <div className="user-profile">
+            <div className="user-avatar">
               {user?.photoURL ? (
                 <img 
                   src={user.photoURL} 
                   alt="Profile" 
-                  className={styles.profileAvatarImg}
+                  className="profile-avatar-img"
                 />
               ) : (
                 <User size={24} />
               )}
             </div>
-            <div className={styles.userInfo}>
-              <h1 className={styles.userName}>
+            <div className="user-info">
+              <h1 className="user-name">
                 {user?.displayName || user?.email?.split('@')[0] || 'Gamer'}
               </h1>
-              <p className={styles.userGamer}>GAMER DASHBOARD</p>
+              <p className="user-gamer">GAMER DASHBOARD</p>
             </div>
           </div>
         </div>
       </header>
 
-      <div className={styles.content}>
+      <div className="dashboard-content">
         {/* Sidebar */}
-        <aside className={styles.sidebar}>
-          <nav className={styles.sidebarNav}>
+        <aside className="dashboard-sidebar">
+          <nav className="sidebar-nav">
             <button 
-              className={`${styles.navItem} ${activeTab === 'profile' ? styles.navItemActive : ''}`}
+              className={`nav-item ${activeTab === 'profile' ? 'active' : ''}`}
               onClick={() => setActiveTab('profile')}
             >
               <User size={20} />
@@ -678,7 +684,7 @@ const Dashboard = () => {
             </button>
 
             <button 
-              className={`${styles.navItem} ${activeTab === 'orders' ? styles.navItemActive : ''}`}
+              className={`nav-item ${activeTab === 'orders' ? 'active' : ''}`}
               onClick={() => setActiveTab('orders')}
             >
               <Package size={20} />
@@ -686,7 +692,7 @@ const Dashboard = () => {
             </button>
 
             <button 
-              className={`${styles.navItem} ${activeTab === 'balance' ? styles.navItemActive : ''}`}
+              className={`nav-item ${activeTab === 'balance' ? 'active' : ''}`}
               onClick={() => setActiveTab('balance')}
             >
               <DollarSign size={20} />
@@ -694,14 +700,14 @@ const Dashboard = () => {
             </button>
 
             <button 
-              className={`${styles.navItem} ${activeTab === 'security' ? styles.navItemActive : ''}`}
+              className={`nav-item ${activeTab === 'security' ? 'active' : ''}`}
               onClick={() => setActiveTab('security')}
             >
               <Shield size={20} />
               <span>Security</span>
             </button>
 
-            <button className={`${styles.navItem} ${styles.logoutBtn}`} onClick={handleLogout}>
+            <button className="nav-item logout-btn" onClick={handleLogout}>
               <LogOut size={20} />
               <span>Log Out</span>
             </button>
@@ -709,7 +715,7 @@ const Dashboard = () => {
         </aside>
 
         {/* Main Content */}
-        <main className={styles.main}>
+        <main className="dashboard-main">
           {renderContent()}
         </main>
       </div>

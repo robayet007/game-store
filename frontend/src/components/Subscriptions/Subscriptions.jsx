@@ -121,9 +121,11 @@ const Subscriptions = () => {
   }
 
   return (
+    
     <div className="subscriptions-container">
       <div className="subscriptions-header">
         <h2 className="subscriptions-title">Gaming Subscriptions</h2>
+        <p>hi</p>
         <p className="subscriptions-subtitle">Level up your entertainment experience</p>
       </div>
       

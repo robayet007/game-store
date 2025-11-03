@@ -1,7 +1,7 @@
 import axios from 'axios';
 
 const API = axios.create({
-  baseURL: 'http://13.236.52.33:5000/api',  // ✅ Changed to your live server
+  baseURL: '/api',  // ✅ Changed to relative path for Vercel
 });
 
 // ✅ Add request interceptor for better error handling
@@ -68,9 +68,6 @@ export const paymentAPI = {
   // ✅ Balance Management
   getUserBalance: (userId) => API.get(`/payments/balance/${userId}`),
   
-  // ✅ Payment Creation
-  createPayment: (paymentData) => API.post('/payments/create', paymentData),
-  
   // ✅ Payment History
   getUserPayments: (userId) => API.get(`/payments/user/${userId}`),
   
@@ -82,6 +79,18 @@ export const paymentAPI = {
   // ✅ Payment Status
   getPaymentById: (paymentId) => API.get(`/payments/${paymentId}`),
   updatePaymentStatus: (paymentId, statusData) => API.put(`/payments/${paymentId}/status`, statusData)
+};
+
+// ✅ Order APIs (missing in your code)
+export const orderAPI = {
+  getUserOrders: (userId, page = 1, limit = 20) => 
+    API.get(`/orders/user/${userId}?page=${page}&limit=${limit}`),
+  
+  getUserOrderStats: (userId) => API.get(`/orders/user/${userId}/stats`),
+  
+  createOrder: (orderData) => API.post('/orders', orderData),
+  
+  getOrderById: (orderId) => API.get(`/orders/${orderId}`)
 };
 
 // ✅ Admin APIs (if needed separately)

@@ -5,8 +5,8 @@ import { useNavigate } from 'react-router-dom';
 import { useProducts } from '../../hooks/useProducts';
 import "./GameShop.css";
 
-// ✅ Base URL constant
-const BASE_URL = "http://13.236.52.33:5000";
+// ✅ BASE_URL change করুন - Vercel proxy use করুন
+const BASE_URL = ""; // Empty string for relative paths
 
 const categories = ["All", "Battle Royale", "FPS", "MOBA", "Sports", "Strategy", "RPG"];
 
@@ -24,7 +24,7 @@ function GameShop() {
     return matchesCategory && matchesSearch;
   });
 
-  // ✅ Image URL handler function
+  // ✅ Image URL handler function - Updated for Vercel
   const getImageUrl = (imgPath) => {
     if (!imgPath) return 'https://images.unsplash.com/photo-1550745165-9bc0b252726f?w=400&h=300&fit=crop';
     
@@ -33,7 +33,8 @@ function GameShop() {
     }
     
     if (imgPath.startsWith('/uploads/')) {
-      return `${BASE_URL}${imgPath}`;  // ✅ BASE_URL use করা হয়েছে
+      // ✅ Vercel proxy এর মাধ্যমে image serve হবে
+      return `/api${imgPath}`;  // Changed to use Vercel proxy
     }
     
     return 'https://images.unsplash.com/photo-1550745165-9bc0b252726f?w=400&h=300&fit=crop';

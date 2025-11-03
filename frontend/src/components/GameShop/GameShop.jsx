@@ -197,7 +197,8 @@ function GameShop() {
                 <div className="game-actions">
                   <button 
                     className="play-now-btn"
-                    onClick={(e) => handleTopUpClick(game, e)}
+                    // onClick={(e) => handleTopUpClick(game, e)}
+                    onClick={(e) => handleDetailsClick(game, e)}
                   >
                     Top Up Now
                   </button>

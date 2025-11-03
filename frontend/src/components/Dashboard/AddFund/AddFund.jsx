@@ -69,17 +69,9 @@ const AddFund = ({
     return phoneRegex.test(phone.replace(/\s+/g, ''));
   };
 
-  // ✅ FIXED: Dynamic API URL based on environment
+  // ✅ FIXED: Use Vercel proxy for all environments
   const getApiBaseUrl = () => {
-    const currentHost = window.location.hostname;
-    
-    if (currentHost === 'game-store-two-pi.vercel.app') {
-      return 'https://metagamestore.duckdns.org';
-    } else if (currentHost === 'localhost') {
-      return 'http://localhost:5000';
-    } else {
-      return 'http://localhost:5000';
-    }
+    return '/api'; // ✅ Vercel proxy use korbe
   };
 
   // Handle balance add request
@@ -131,7 +123,7 @@ const AddFund = ({
     setShowMathChallenge(true);
   };
 
-  // ✅ FIXED: Handle math challenge submission with better API call
+  // ✅ FIXED: Handle math challenge submission with Vercel proxy
   const handleMathChallengeSubmit = async () => {
     if (!userMathAnswer.trim()) {
       setPaymentError('দয়া করে গাণিতিক প্রশ্নের উত্তর দিন!');
@@ -172,10 +164,10 @@ const AddFund = ({
       };
 
       console.log('💰 Payment Request Details:', paymentData);
-      console.log('🌐 API URL:', `${API_BASE_URL}/api/payments/create`);
+      console.log('🌐 API URL:', `${API_BASE_URL}/payments/create`); // ✅ Path change
 
-      // ✅ FIXED: Better API call with error handling
-      const response = await fetch(`${API_BASE_URL}/api/payments/create`, {
+      // ✅ FIXED: Use Vercel proxy API call
+      const response = await fetch(`${API_BASE_URL}/payments/create`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

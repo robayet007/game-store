@@ -249,7 +249,7 @@ Thank you for your purchase! 🎮`);
   const getImageUrl = (imgPath) => {
     if (!imgPath) return 'https://via.placeholder.com/300x200/667eea/ffffff?text=Product+Image';
     if (imgPath.startsWith('http')) return imgPath;
-    if (imgPath.startsWith('/uploads/')) return `/api${imgPath}`; // ✅ Vercel proxy use korbe
+    if (imgPath.startsWith('/uploads/')) return imgPath; // ✅ Vercel proxy use korbe
     return 'https://via.placeholder.com/300x200/667eea/ffffff?text=Product+Image';
   };
 

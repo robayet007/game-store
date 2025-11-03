@@ -47,7 +47,7 @@ const GameDetails = () => {
   const getImageUrl = (imgPath) => {
     if (!imgPath) return 'https://via.placeholder.com/400x300/667eea/ffffff?text=Game+Image';
     if (imgPath.startsWith('http')) return imgPath;
-    if (imgPath.startsWith('/uploads/')) return `/api${imgPath}`;  // ✅ Vercel proxy use korbe
+    if (imgPath.startsWith('/uploads/')) return imgPath;  // ✅ Vercel proxy use korbe
     return 'https://via.placeholder.com/400x300/667eea/ffffff?text=Game+Image';
   };
 

@@ -1033,6 +1033,8 @@
 
   .sidebar {
     padding: 0.75rem;
+    display: flex;
+    justify-content: space-between;
   }
 
   .ordersStats {

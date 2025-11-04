@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { DollarSign, Plus, Clock, CheckCircle, X } from 'lucide-react';
 import { auth } from '../../../firebaseConfig';
-import './AddFund.css';
+import styles from './AddFund.module.css'; // ✅ Module CSS import
 
 const AddFund = ({ 
   currentBalance, 
@@ -11,7 +11,6 @@ const AddFund = ({
   onBalanceUpdate
 }) => {
   const [addAmount, setAddAmount] = useState('');
-  const [transactionId, setTransactionId] = useState('');
   const [senderNumber, setSenderNumber] = useState('');
   const [paymentLoading, setPaymentLoading] = useState(false);
   const [paymentError, setPaymentError] = useState('');
@@ -54,14 +53,6 @@ const AddFund = ({
     return { question, answer };
   };
 
-  // Validate transaction ID
-  const validateTransactionId = (trxId) => {
-    if (!trxId.trim()) return false;
-    const trimmedTrx = trxId.trim().toUpperCase();
-    const trxRegex = /^[A-Z][A-Z0-9]{5,}$/;
-    return trxRegex.test(trimmedTrx);
-  };
-
   // Validate phone number
   const validatePhoneNumber = (phone) => {
     if (!phone.trim()) return false;
@@ -69,69 +60,62 @@ const AddFund = ({
     return phoneRegex.test(phone.replace(/\s+/g, ''));
   };
 
-  // ✅ FIXED: Use Vercel proxy for all environments
+  // Get API base URL
   const getApiBaseUrl = () => {
-    return '/api'; // ✅ Vercel proxy use korbe
+    return '/api';
+  };
+
+  // ✅ Generate unique transaction ID based on timestamp + random
+  const generateTransactionId = () => {
+    const timestamp = Date.now().toString(36).toUpperCase();
+    const random = Math.random().toString(36).substring(2, 6).toUpperCase();
+    return `C${timestamp}${random}`;
   };
 
   // Handle balance add request
   const handleAddBalance = async (e) => {
     e.preventDefault();
     
-    // Check if user is logged in
     if (!user) {
-      setPaymentError('দয়া করে প্রথমে লগইন করুন!');
+      setPaymentError('দয়া করে প্রথমে লগইন করুন!');
       return;
     }
 
     const amount = parseFloat(addAmount);
     
     if (isNaN(amount) || amount <= 0) {
-      setPaymentError('দয়া করে সঠিক অ্যামাউন্ট লিখুন!');
+      setPaymentError('দয়া করে সঠিক অ্যামাউন্ট লিখুন!');
       return;
     }
 
-    if (amount < 1000) {
-      setPaymentError('ন্যূনতম ১০০০ টাকা যোগ করতে হবে!');
-      return;
-    }
-
-    if (!transactionId.trim()) {
-      setPaymentError('দয়া করে bKash ট্রানজেকশন আইডি দিন!');
+    if (amount < 10) {
+      setPaymentError('ন্যূনতম ১০ টাকা যোগ করতে হবে!');
       return;
     }
 
     if (!senderNumber.trim()) {
-      setPaymentError('দয়া করে আপনার bKash নম্বর দিন!');
+      setPaymentError('দয়া করে আপনার bKash নম্বর দিন!');
       return;
     }
 
-    // Validate transaction ID
-    if (!validateTransactionId(transactionId)) {
-      setPaymentError('ট্রানজেকশন আইডি সঠিক নয়! সঠিক ট্রানজেকশন আইডি দিন (সাধারণত C দিয়ে শুরু)');
-      return;
-    }
-
-    // Validate phone number
     if (!validatePhoneNumber(senderNumber)) {
-      setPaymentError('bKash নম্বর সঠিক নয়! 11 ডিজিটের নম্বর দিন (যেমন: 01712345678)');
+      setPaymentError('bKash নম্বর সঠিক নয়! 11 ডিজিটের নম্বর দিন (যেমন: 01712345678)');
       return;
     }
 
-    // Generate math challenge
     generateMathQuestion();
     setShowMathChallenge(true);
   };
 
-  // ✅ FIXED: Handle math challenge submission with Vercel proxy
+  // Handle math challenge submission
   const handleMathChallengeSubmit = async () => {
     if (!userMathAnswer.trim()) {
-      setPaymentError('দয়া করে গাণিতিক প্রশ্নের উত্তর দিন!');
+      setPaymentError('দয়া করে গাণিতিক প্রশ্নের উত্তর দিন!');
       return;
     }
 
     if (userMathAnswer !== mathAnswer) {
-      setPaymentError(`গাণিতিক প্রশ্নের উত্তর ভুল হয়েছে! সঠিক উত্তর: ${mathAnswer}`);
+      setPaymentError(`গাণিতিক প্রশ্নের উত্তর ভুল হয়েছে! সঠিক উত্তর: ${mathAnswer}`);
       setUserMathAnswer('');
       return;
     }
@@ -144,10 +128,12 @@ const AddFund = ({
       const amount = parseFloat(addAmount);
       const API_BASE_URL = getApiBaseUrl();
       
-      // Prepare payment data with user info
+      // ✅ Auto-generate transaction ID
+      const autoGeneratedTrxId = generateTransactionId();
+      
       const paymentData = {
         amount: amount,
-        transactionId: transactionId.toUpperCase().trim(),
+        transactionId: autoGeneratedTrxId, // ✅ Auto-generated
         senderNumber: senderNumber.trim(),
         userBkashNumber: userBkashNumber || '01766325020',
         user: {
@@ -164,9 +150,8 @@ const AddFund = ({
       };
 
       console.log('💰 Payment Request Details:', paymentData);
-      console.log('🌐 API URL:', `${API_BASE_URL}/payments/create`); // ✅ Path change
+      console.log('🌐 API URL:', `${API_BASE_URL}/payments/create`);
 
-      // ✅ FIXED: Use Vercel proxy API call
       const response = await fetch(`${API_BASE_URL}/payments/create`, {
         method: 'POST',
         headers: {
@@ -175,7 +160,6 @@ const AddFund = ({
         body: JSON.stringify(paymentData)
       });
 
-      // ✅ Check if response is OK
       if (!response.ok) {
         const errorText = await response.text();
         console.error('❌ Server error response:', errorText);
@@ -186,27 +170,22 @@ const AddFund = ({
       console.log('✅ Backend Response:', result);
 
       if (!result.success) {
-        throw new Error(result.message || 'পেমেন্ট সাবমিট করতে সমস্যা হয়েছে');
+        throw new Error(result.message || 'পেমেন্ট সাবমিট করতে সমস্যা হয়েছে');
       }
 
-      // ✅ Parent component-কে inform করো payment successful হয়েছে
       if (onAddPendingBalance) {
         onAddPendingBalance(paymentData);
       }
 
-      // ✅ Balance update করো
       if (onBalanceUpdate) {
         onBalanceUpdate({
           pendingBalance: (pendingBalance || 0) + amount
         });
       }
 
-      // Success message
-      setSuccessMessage(`৳ ${amount.toLocaleString()} পেন্ডিং ব্যালেন্সে যোগ হয়েছে! অ্যাডমিন ভেরিফাই করার পর এভেইলেবল হবে।`);
+      setSuccessMessage(`৳ ${amount.toLocaleString()} পেন্ডিং ব্যালেন্সে যোগ হয়েছে! রেফারেন্স নম্বর: ${autoGeneratedTrxId}. অ্যাডমিন ভেরিফাই করার পর এভেইলেবল হবে।`);
       
-      // Reset form
       setAddAmount('');
-      setTransactionId('');
       setSenderNumber('');
       setUserMathAnswer('');
       setShowMathChallenge(false);
@@ -214,13 +193,12 @@ const AddFund = ({
     } catch (error) {
       console.error('❌ Payment error:', error);
       
-      // ✅ Better error messages based on error type
       if (error.message.includes('Failed to fetch')) {
-        setPaymentError('বেকেন্ড সার্ভারে কানেক্ট হতে পারছি না। দয়া করে আবার চেষ্টা করুন।');
+        setPaymentError('বেকেন্ড সার্ভারে কানেক্ট হতে পারছি না। দয়া করে আবার চেষ্টা করুন।');
       } else if (error.message.includes('Server error')) {
-        setPaymentError('সার্ভারে সমস্যা হচ্ছে। দয়া করে কিছুক্ষণ পর আবার চেষ্টা করুন।');
+        setPaymentError('সার্ভারে সমস্যা হচ্ছে। দয়া করে কিছুক্ষণ পর আবার চেষ্টা করুন।');
       } else {
-        setPaymentError(error.message || 'পেমেন্ট সাবমিট করতে সমস্যা হয়েছে। আবার চেষ্টা করুন।');
+        setPaymentError(error.message || 'পেমেন্ট সাবমিট করতে সমস্যা হয়েছে। আবার চেষ্টা করুন।');
       }
     } finally {
       setPaymentLoading(false);
@@ -234,12 +212,11 @@ const AddFund = ({
     setSuccessMessage('');
   };
 
-  // ✅ যদি user না থাকে, loading show করবে
   if (!user) {
     return (
-      <div className="add-fund-container">
-        <div className="loading-spinner">
-          <div className="spinner"></div>
+      <div className={styles.addFundContainer}>
+        <div className={styles.loadingSpinner}>
+          <div className={styles.spinner}></div>
           <p>লোড হচ্ছে...</p>
         </div>
       </div>
@@ -247,11 +224,11 @@ const AddFund = ({
   }
 
   return (
-    <div className="add-fund-container">
+    <div className={styles.addFundContainer}>
       {/* User Info Display */}
       {user && (
-        <div className="user-info-card">
-          <div className="user-info">
+        <div className={styles.userInfoCard}>
+          <div className={styles.userInfo}>
             <strong>ইউজার:</strong> {user.email}
             {user.displayName && <span> | {user.displayName}</span>}
           </div>
@@ -259,31 +236,31 @@ const AddFund = ({
       )}
 
       {/* Balance Cards */}
-      <div className="balance-cards">
+      <div className={styles.balanceCards}>
         {/* Available Balance Card */}
-        <div className="balance-card available">
-          <div className="balance-header">
-            <DollarSign size={24} className="balance-icon" />
-            <div className="balance-info">
+        <div className={`${styles.balanceCard} ${styles.available}`}>
+          <div className={styles.balanceHeader}>
+            <DollarSign size={24} className={styles.balanceIcon} />
+            <div className={styles.balanceInfo}>
               <h4>এভেইলেবল ব্যালেন্স</h4>
-              <div className="balance-amount">৳ {currentBalance?.toFixed(2) || '0.00'}</div>
+              <div className={styles.balanceAmount}>৳ {currentBalance?.toFixed(2) || '0.00'}</div>
             </div>
           </div>
-          <p className="balance-note">
-            এই ব্যালেন্স দিয়ে এখনই অর্ডার করতে পারবেন
+          <p className={styles.balanceNote}>
+            এই ব্যালেন্স দিয়ে এখনই অর্ডার করতে পারবেন
           </p>
         </div>
 
         {/* Pending Balance Card */}
-        <div className="balance-card pending">
-          <div className="balance-header">
-            <Clock size={24} className="balance-icon" />
-            <div className="balance-info">
+        <div className={`${styles.balanceCard} ${styles.pending}`}>
+          <div className={styles.balanceHeader}>
+            <Clock size={24} className={styles.balanceIcon} />
+            <div className={styles.balanceInfo}>
               <h4>পেন্ডিং ব্যালেন্স</h4>
-              <div className="balance-amount">৳ {pendingBalance?.toFixed(2) || '0.00'}</div>
+              <div className={styles.balanceAmount}>৳ {pendingBalance?.toFixed(2) || '0.00'}</div>
             </div>
           </div>
-          <p className="balance-note">
+          <p className={styles.balanceNote}>
             অ্যাডমিন ভেরিফাই করার পর এভেইলেবল হবে
           </p>
         </div>
@@ -291,35 +268,35 @@ const AddFund = ({
 
       {/* Math Challenge Modal */}
       {showMathChallenge && (
-        <div className="math-challenge-modal">
-          <div className="math-challenge-content">
+        <div className={styles.mathChallengeModal}>
+          <div className={styles.mathChallengeContent}>
             <h3>সিকিউরিটি ভেরিফিকেশন</h3>
             <p>নিচের গাণিতিক প্রশ্নের উত্তর দিন:</p>
             
-            <div className="math-question">
+            <div className={styles.mathQuestion}>
               <strong>{mathQuestion}</strong>
             </div>
             
-            <div className="form-group">
+            <div className={styles.formGroup}>
               <input
                 type="text"
                 placeholder="উত্তর লিখুন (সংখ্যা)"
                 value={userMathAnswer}
                 onChange={(e) => setUserMathAnswer(e.target.value.replace(/[^0-9]/g, ''))}
                 disabled={paymentLoading}
-                className="math-input"
+                className={styles.mathInput}
               />
             </div>
 
-            <div className="math-challenge-buttons">
+            <div className={styles.mathChallengeButtons}>
               <button
                 onClick={handleMathChallengeSubmit}
                 disabled={paymentLoading || !userMathAnswer}
-                className="submit-challenge-btn"
+                className={styles.submitChallengeBtn}
               >
                 {paymentLoading ? (
                   <>
-                    <div className="spinner"></div>
+                    <div className={styles.spinner}></div>
                     প্রসেসিং...
                   </>
                 ) : (
@@ -332,7 +309,7 @@ const AddFund = ({
                   setShowMathChallenge(false);
                   setUserMathAnswer('');
                 }}
-                className="cancel-challenge-btn"
+                className={styles.cancelChallengeBtn}
                 disabled={paymentLoading}
               >
                 বাতিল
@@ -342,33 +319,33 @@ const AddFund = ({
         </div>
       )}
 
-      {/* Add Balance Form */}
-      <div className="add-balance-section">
+      {/* Add Balance Section */}
+      <div className={styles.addBalanceSection}>
         <h4>bKash এর মাধ্যমে ব্যালেন্স যোগ করুন</h4>
         
         {paymentError && (
-          <div className="payment-error">
+          <div className={styles.paymentError}>
             <X size={18} />
             {paymentError}
           </div>
         )}
 
         {successMessage && (
-          <div className="success-message">
+          <div className={styles.successMessage}>
             <CheckCircle size={18} />
             {successMessage}
           </div>
         )}
 
         {/* Quick Amount Buttons */}
-        <div className="quick-amount-section">
+        <div className={styles.quickAmountSection}>
           <h5>দ্রুত নির্বাচন করুন:</h5>
-          <div className="quick-amount-buttons">
+          <div className={styles.quickAmountButtons}>
             {quickAmounts.map(amount => (
               <button
                 key={amount}
                 type="button"
-                className={`quick-amount-btn ${addAmount === amount.toString() ? 'selected' : ''}`}
+                className={`${styles.quickAmountBtn} ${addAmount === amount.toString() ? styles.selected : ''}`}
                 onClick={() => handleQuickAmount(amount)}
                 disabled={paymentLoading}
               >
@@ -379,8 +356,8 @@ const AddFund = ({
         </div>
 
         {/* Custom Amount Form */}
-        <form onSubmit={handleAddBalance} className="add-balance-form">
-          <div className="form-group">
+        <form onSubmit={handleAddBalance} className={styles.addBalanceForm}>
+          <div className={styles.formGroup}>
             <label>কাস্টম অ্যামাউন্ট</label>
             <input 
               type="number" 
@@ -395,16 +372,16 @@ const AddFund = ({
               step="1"
               required
               disabled={paymentLoading}
-              className="amount-input"
+              className={styles.amountInput}
             />
-            <small>ন্যূনতম ১০ টাকা যোগ করতে হবে</small>
+            <small>ন্যূনতম ১০০০ টাকা যোগ করতে হবে</small>
           </div>
 
-          <div className="form-group">
+          <div className={styles.formGroup}>
             <label>আপনার bKash নম্বর</label>
             <input 
               type="tel" 
-              placeholder="আপনার bKash নম্বর (যেমন: 017xxxxxx)"
+              placeholder="আপনার bKash নম্বর (যেমন: 017xxxxxxxx)"
               value={senderNumber}
               onChange={(e) => {
                 setSenderNumber(e.target.value);
@@ -413,7 +390,7 @@ const AddFund = ({
               }}
               required
               disabled={paymentLoading}
-              className="phone-input"
+              className={styles.phoneInput}
               style={{
                 borderColor: senderNumber && !validatePhoneNumber(senderNumber) ? '#dc3545' : '#d1d5db',
                 color: senderNumber && !validatePhoneNumber(senderNumber) ? '#dc3545' : '#1a1a1a'
@@ -421,45 +398,19 @@ const AddFund = ({
             />
             <small>
               {senderNumber && !validatePhoneNumber(senderNumber) 
-                ? '⚠️ bKash নম্বর সঠিক নয় (11 ডিজিটের নম্বর দিন)' 
-                : 'আপনার bKash নম্বর যেখান থেকে টাকা পাঠাবেন'}
-            </small>
-          </div>
-
-          <div className="form-group">
-            <label>bKash ট্রানজেকশন আইডি</label>
-            <input 
-              type="text" 
-              placeholder="bKash Trx ID (যেমন: C6A8B9X2)"
-              value={transactionId}
-              onChange={(e) => {
-                setTransactionId(e.target.value);
-                setPaymentError('');
-                setSuccessMessage('');
-              }}
-              required
-              disabled={paymentLoading}
-              className="trx-input"
-              style={{
-                borderColor: transactionId && !validateTransactionId(transactionId) ? '#dc3545' : '#d1d5db',
-                color: transactionId && !validateTransactionId(transactionId) ? '#dc3545' : '#1a1a1a'
-              }}
-            />
-            <small>
-              {transactionId && !validateTransactionId(transactionId) 
-                ? '⚠️ ট্রানজেকশন আইডি সঠিক নয় (সাধারণত C দিয়ে শুরু হয়)' 
-                : 'Money Send করার পর যে Trx ID পাবেন (যেমন: C6A8B9X2)'}
+                ? '⚠️ bKash নম্বর সঠিক নয় (11 ডিজিটের নম্বর দিন)' 
+                : 'যে bKash নম্বর থেকে টাকা পাঠাবেন সেই নম্বর দিন'}
             </small>
           </div>
           
           <button 
             type="submit" 
-            className="add-balance-btn"
-            disabled={paymentLoading || !addAmount || !transactionId || !senderNumber || parseFloat(addAmount) < 1000 || !validateTransactionId(transactionId) || !validatePhoneNumber(senderNumber)}
+            className={styles.addBalanceBtn}
+            disabled={paymentLoading || !addAmount || !senderNumber || parseFloat(addAmount) < 10 || !validatePhoneNumber(senderNumber)}
           >
             {paymentLoading ? (
               <>
-                <div className="spinner"></div>
+                <div className={styles.spinner}></div>
                 প্রসেসিং...
               </>
             ) : (
@@ -472,19 +423,20 @@ const AddFund = ({
         </form>
 
         {/* Payment Instructions */}
-        <div className="payment-instructions">
+        <div className={styles.paymentInstructions}>
           <h5>পেমেন্ট নির্দেশনা:</h5>
           <ol>
-            <li>উপরে অ্যামাউন্ট সিলেক্ট করুন</li>
-            <li><strong>bKash App এ গিয়ে 01766325020 নম্বরে মানি সেন্ড করুন</strong></li>
-            <li>আপনার bKash নম্বর দিন</li>
-            {/* <li>ট্রানজেকশন আইডি কপি করে এখানে পেস্ট করুন (যেমন: C6A8B9X2)</li> */}
-            <li>গাণিতিক প্রশ্নের উত্তর দিন (যেমন: 8 + 8 = 16)</li>
+            <li>উপরে অ্যামাউন্ট সিলেক্ট করুন (ন্যূনতম ১০ টাকা)</li>
+            <li><strong>bKash App এ গিয়ে 01766325020 নম্বরে Send Money করুন</strong></li>
+            <li>যে bKash নম্বর থেকে টাকা পাঠিয়েছেন সেই নম্বর দিন</li>
+            <li>গাণিতিক প্রশ্নের উত্তর দিন (সিকিউরিটি যাচাই)</li>
             <li>ভেরিফাই করুন - অ্যামাউন্ট পেন্ডিং ব্যালেন্সে যোগ হবে</li>
-            <li>অ্যাডমিন চেক করার পর ব্যালেন্স এভেইলেবল হবে</li>
+            <li>অ্যাডমিন আপনার bKash নম্বর চেক করে ভেরিফাই করবে</li>
+            <li>ভেরিফাই হলে ব্যালেন্স এভেইলেবল হয়ে যাবে</li>
           </ol>
           
-          <div className="important-note">
+          <div className={styles.importantNote}>
+            <strong>⚠️ গুরুত্বপূর্ণ:</strong> অবশ্যই আপনার নিজের bKash নম্বর থেকে Send Money করবেন। অ্যাডমিন সেই নম্বর দিয়েই ভেরিফাই করবে।
           </div>
         </div>
       </div>
@@ -492,4 +444,4 @@ const AddFund = ({
   );
 };
 
-export default AddFund; 
+export default AddFund;

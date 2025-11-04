@@ -169,7 +169,7 @@ const GameDetailsUser = () => {
         </div>
       </div>
       
-      <Footer/>
+      {/* <Footer/> */}
     </>
   );
 };

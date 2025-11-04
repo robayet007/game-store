@@ -374,7 +374,7 @@ const AddFund = ({
               disabled={paymentLoading}
               className={styles.amountInput}
             />
-            <small>ন্যূনতম ১০০০ টাকা যোগ করতে হবে</small>
+            <small>ন্যূনতম ১০ টাকা যোগ করতে হবে</small>
           </div>
 
           <div className={styles.formGroup}>

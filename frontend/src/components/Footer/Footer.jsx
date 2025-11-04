@@ -19,7 +19,7 @@ const Footer = () => {
         {/* Top Section */}
         <div className="footer-top">
           <div className="footer-brand">
-            <h2 className="footer-title">META GAME SHOP</h2>
+            <h2 className="footer-title">META GAME STORE</h2>
             <p className="footer-tagline">Level Up Your Gaming Experience</p>
             <div className="support-number">
               <HeadphonesIcon size={16} />

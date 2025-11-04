@@ -10,7 +10,7 @@ const Navbar = () => {
         </Link>
       </div>
       <Link to="/">
-        <div className={styles.logoName}>META-GAME-SHOP</div>
+        <div className={styles.logoName}>META-GAME-STORE</div>
       </Link>
     </nav>
   );

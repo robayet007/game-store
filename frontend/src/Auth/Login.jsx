@@ -10,7 +10,6 @@ import "./Login.css"
 const ADMIN_USERS = [
   'admin@metagameshop.com',
   'evolveera25@gmail.com',
-  "mdemonhassan1334@gmail.com"
 ];
 
 // ✅ Admin Check Function

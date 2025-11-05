@@ -1,4 +1,4 @@
-/* Checkout.module.css - Fixed Version */
+/* Checkout.module.css - Mobile Responsive Fixed Version */
 .checkoutContainer {
   max-width: 1200px;
   margin: 3rem auto 0 auto;
@@ -561,19 +561,20 @@
   color: #667eea;
 }
 
-/* Confirmation Popup */
+/* Confirmation Popup - FIXED FOR MOBILE */
 .confirmationOverlay {
   position: fixed;
   top: 0;
   left: 0;
   right: 0;
   bottom: 0;
-  background: rgba(0, 0, 0, 0.8);
+  background: rgba(0, 0, 0, 0.85);
   display: flex;
   justify-content: center;
   align-items: center;
   z-index: 10000;
   padding: 20px;
+  overflow-y: auto;
 }
 
 .confirmationPopup {
@@ -582,9 +583,12 @@
   padding: 2rem;
   max-width: 500px;
   width: 100%;
+  max-height: 90vh;
+  overflow-y: auto;
   box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
   border: 1px solid rgba(255, 255, 255, 0.1);
   animation: popupSlideIn 0.3s ease-out;
+  margin: auto;
 }
 
 @keyframes popupSlideIn {
@@ -641,6 +645,7 @@
 .detailItem:last-child {
   border-bottom: none;
   margin-bottom: 0;
+  padding-bottom: 0;
 }
 
 .detailItem .totalAmount {
@@ -696,6 +701,7 @@
   background: rgba(0, 0, 0, 0.4);
   color: #fff;
   text-align: center;
+  box-sizing: border-box;
 }
 
 .confirmationTextInput:focus {
@@ -708,6 +714,7 @@
   display: flex;
   gap: 12px;
   justify-content: flex-end;
+  margin-top: 1.5rem;
 }
 
 .cancelBtn {
@@ -848,14 +855,37 @@
     width: 120px;
     height: 120px;
   }
-  
+
+  /* Tablet Confirmation Popup */
   .confirmationPopup {
     padding: 1.5rem;
-    margin: 1rem;
+    max-height: 85vh;
   }
-  
+
+  .popupHeader h3 {
+    font-size: 1.3rem;
+  }
+
+  .orderDetails {
+    padding: 1rem;
+    grid-template-columns: 1fr !important;
+  }
+
+  .detailItem {
+    font-size: 0.9rem;
+    margin-bottom: 0.6rem;
+    padding-bottom: 0.6rem;
+  }
+
   .popupActions {
     flex-direction: column;
+    gap: 10px;
+  }
+
+  .cancelBtn,
+  .confirmBtn {
+    width: 100%;
+    padding: 14px 24px;
   }
 }
 
@@ -886,5 +916,106 @@
   .quantityControlsTop {
     top: 10px;
     left: 10px;
+  }
+
+  /* Mobile Confirmation Popup - CRITICAL FIXES */
+  .confirmationOverlay {
+    padding: 10px;
+    align-items: flex-start;
+    padding-top: 20px;
+  }
+
+  .confirmationPopup {
+    padding: 1.2rem;
+    max-height: 80vh;
+    margin: 0;
+    border-radius: 12px;
+  }
+
+  .popupHeader {
+    margin-bottom: 1rem;
+    padding-bottom: 0.8rem;
+  }
+
+  .popupHeader h3 {
+    font-size: 1.2rem;
+  }
+
+  .popupHeader p {
+    font-size: 0.85rem;
+  }
+
+  .orderDetails {
+    padding: 0.8rem;
+    margin-bottom: 1rem;
+  }
+
+  .detailItem {
+    font-size: 0.85rem;
+    flex-wrap: wrap;
+  }
+
+  .gameDetails {
+    padding: 0.8rem;
+    margin-bottom: 1rem;
+  }
+
+  .gameDetails h4 {
+    font-size: 0.9rem;
+  }
+
+  .gameDetails p {
+    font-size: 0.85rem;
+  }
+
+  .confirmationInput {
+    margin-top: 1rem;
+  }
+
+  .confirmationInput label {
+    font-size: 0.9rem;
+    margin-bottom: 0.6rem;
+  }
+
+  .confirmationTextInput {
+    padding: 0.8rem;
+    font-size: 0.95rem;
+  }
+
+  .popupActions {
+    gap: 8px;
+    margin-top: 1rem;
+  }
+
+  .cancelBtn,
+  .confirmBtn {
+    padding: 12px 20px;
+    font-size: 0.95rem;
+  }
+}
+
+/* Extra small devices */
+@media (max-width: 360px) {
+  .confirmationPopup {
+    padding: 1rem;
+    max-height: 75vh;
+  }
+
+  .popupHeader h3 {
+    font-size: 1.1rem;
+  }
+
+  .orderDetails {
+    padding: 0.6rem;
+  }
+
+  .detailItem {
+    font-size: 0.8rem;
+  }
+
+  .cancelBtn,
+  .confirmBtn {
+    padding: 10px 16px;
+    font-size: 0.9rem;
   }
 }

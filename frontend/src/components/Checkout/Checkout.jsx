@@ -18,7 +18,8 @@ const Checkout = ({ user }) => {
     playerUID: '',
     username: '',
     whatsapp: '',
-    email: ''
+    email: '',
+    idLink: '' // New field for special offers
   });
   const [quantity, setQuantity] = useState(1);
   const [userBalance, setUserBalance] = useState(0);
@@ -143,15 +144,25 @@ const Checkout = ({ user }) => {
   const handlePurchaseClick = (e) => {
     e.preventDefault();
     
-    // Form validation
-    if (!formData.whatsapp) {
-      alert('Please enter your WhatsApp number');
-      return;
-    }
-
-    if (selectedItem.category === 'game-topup' && (!formData.playerUID || !formData.username)) {
-      alert('Please enter your game UID and username');
-      return;
+    // Form validation based on category
+    if (selectedItem.category === 'special-offers') {
+      // Special offers: Only require ID link
+      if (!formData.idLink) {
+        alert('Please enter your ID link');
+        return;
+      }
+    } else if (selectedItem.category === 'game-topup') {
+      // Game topup: Require UID, username, and whatsapp
+      if (!formData.playerUID || !formData.username || !formData.whatsapp) {
+        alert('Please enter your game UID, username, and WhatsApp number');
+        return;
+      }
+    } else {
+      // Other categories (subscription): Require whatsapp
+      if (!formData.whatsapp) {
+        alert('Please enter your WhatsApp number');
+        return;
+      }
     }
 
     // Show confirmation popup
@@ -179,6 +190,7 @@ const Checkout = ({ user }) => {
         playerUID: formData.playerUID,
         gameUsername: formData.username,
         whatsappNumber: formData.whatsapp,
+        idLink: formData.idLink, // Add ID link for special offers
         category: selectedItem.category,
         paymentMethod: 'meta_balance'
       };
@@ -214,7 +226,6 @@ const Checkout = ({ user }) => {
 🎮 Product: ${selectedItem.title}
 🔢 Quantity: ${quantity}
 💰 Total Paid: ৳ ${totalAmount}
-📞 Contact: ${formData.whatsapp}
 💳 New Balance: ৳ ${result.newBalance}
 
 Thank you for your purchase! 🎮`);
@@ -260,6 +271,8 @@ Thank you for your purchase! 🎮`);
           formTitle: 'Subscription Information',
           buttonText: 'Subscribe Now',
           showGameFields: false,
+          showIdLink: false,
+          showWhatsapp: true,
           showEmail: true,
           description: 'Subscribe to premium service'
         };
@@ -268,6 +281,8 @@ Thank you for your purchase! 🎮`);
           formTitle: 'Game Top-up Information', 
           buttonText: 'Purchase Now',
           showGameFields: true,
+          showIdLink: false,
+          showWhatsapp: true,
           showEmail: false,
           description: 'Game currency top-up'
         };
@@ -276,6 +291,8 @@ Thank you for your purchase! 🎮`);
           formTitle: 'Special Offer Purchase',
           buttonText: 'Get This Deal',
           showGameFields: false,
+          showIdLink: true,
+          showWhatsapp: false,
           showEmail: true,
           description: 'Special limited time offer'
         };
@@ -284,6 +301,8 @@ Thank you for your purchase! 🎮`);
           formTitle: 'Purchase Information',
           buttonText: 'Buy Now',
           showGameFields: false,
+          showIdLink: false,
+          showWhatsapp: true,
           showEmail: true,
           description: 'Product purchase'
         };
@@ -391,6 +410,13 @@ Thank you for your purchase! 🎮`);
                   <h4>Game Information:</h4>
                   <p><strong>UID:</strong> {formData.playerUID}</p>
                   <p><strong>Username:</strong> {formData.username}</p>
+                </div>
+              )}
+
+              {selectedItem.category === 'special-offers' && (
+                <div className={styles.gameDetails}>
+                  <h4>ID Link:</h4>
+                  <p><strong>Link:</strong> {formData.idLink}</p>
                 </div>
               )}
 
@@ -546,6 +572,22 @@ Thank you for your purchase! 🎮`);
                 </>
               )}
 
+              {categoryConfig.showIdLink && (
+                <div className={styles.formGroup}>
+                  <label htmlFor="idLink">ID Link *</label>
+                  <input
+                    type="text"
+                    id="idLink"
+                    name="idLink"
+                    value={formData.idLink}
+                    onChange={handleInputChange}
+                    placeholder="Enter your ID link"
+                    required
+                  />
+                  <small>Please provide your ID link for this special offer</small>
+                </div>
+              )}
+
               {categoryConfig.showEmail && (
                 <div className={styles.formGroup}>
                   <label htmlFor="email">Email Address *</label>
@@ -563,19 +605,21 @@ Thank you for your purchase! 🎮`);
                 </div>
               )}
 
-              <div className={styles.formGroup}>
-                <label htmlFor="whatsapp">WhatsApp Number *</label>
-                <input
-                  type="tel"
-                  id="whatsapp"
-                  name="whatsapp"
-                  value={formData.whatsapp}
-                  onChange={handleInputChange}
-                  placeholder="Enter your WhatsApp number"
-                  required
-                />
-                <small>We'll contact you for confirmation</small>
-              </div>
+              {categoryConfig.showWhatsapp && (
+                <div className={styles.formGroup}>
+                  <label htmlFor="whatsapp">WhatsApp Number *</label>
+                  <input
+                    type="tel"
+                    id="whatsapp"
+                    name="whatsapp"
+                    value={formData.whatsapp}
+                    onChange={handleInputChange}
+                    placeholder="Enter your WhatsApp number"
+                    required
+                  />
+                  <small>We'll contact you for confirmation</small>
+                </div>
+              )}
 
               <div className={styles.orderSummary}>
                 <h3 className={styles.summaryTitle}>Order Summary</h3>

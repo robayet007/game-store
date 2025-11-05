@@ -87,7 +87,7 @@ const OfferCard = ({ product }) => {
       </div>
       <hr />
       <div className="deal-card-price">
-        <div className="discount-price">৳ {discountPrice}</div>
+        {/* <div className="discount-price">৳ {discountPrice}</div> */}
         <div className="card-price">৳ {price}</div>
       </div>
     </div>

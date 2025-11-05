@@ -1,4 +1,4 @@
-// Checkout.jsx - With Base URL
+// Checkout.jsx - Fixed Version
 import React, { useState, useEffect } from 'react';
 import { useParams, useLocation, useNavigate } from 'react-router-dom';
 import { Minus, Plus, Wallet } from 'lucide-react';
@@ -17,7 +17,7 @@ const Checkout = ({ user }) => {
   const [formData, setFormData] = useState({
     playerUID: '',
     username: '',
-    whatsapp: '',
+    whatsapp: '', // ✅ WhatsApp number field
     email: '',
     idLink: '' // New field for special offers
   });
@@ -141,6 +141,7 @@ const Checkout = ({ user }) => {
     return selectedItem.price * quantity;
   };
 
+  // ✅ FIXED: WhatsApp number validation and purchase data
   const handlePurchaseClick = (e) => {
     e.preventDefault();
     
@@ -165,11 +166,25 @@ const Checkout = ({ user }) => {
       }
     }
 
+    // ✅ WhatsApp number validation
+    if (formData.whatsapp && !isValidWhatsAppNumber(formData.whatsapp)) {
+      alert('Please enter a valid WhatsApp number');
+      return;
+    }
+
     // Show confirmation popup
     setShowConfirmation(true);
     setConfirmationText('');
   };
 
+  // ✅ WhatsApp number validation function
+  const isValidWhatsAppNumber = (number) => {
+    // Basic validation - you can enhance this as needed
+    const whatsappRegex = /^[0-9+]{10,15}$/;
+    return whatsappRegex.test(number.replace(/\s/g, ''));
+  };
+
+  // ✅ FIXED: Purchase function with proper whatsappNumber field
   const handleConfirmPurchase = async () => {
     if (confirmationText.toLowerCase() !== 'yes') {
       alert('Please type "yes" to confirm your purchase');
@@ -180,6 +195,7 @@ const Checkout = ({ user }) => {
     const totalAmount = calculateTotal();
 
     try {
+      // ✅ FIXED: Ensure whatsappNumber is always included
       const purchaseData = {
         userEmail: user.email,
         productName: selectedItem.title,
@@ -187,15 +203,21 @@ const Checkout = ({ user }) => {
         quantity: quantity,
         unitPrice: selectedItem.price,
         totalAmount: totalAmount,
-        playerUID: formData.playerUID,
-        gameUsername: formData.username,
-        whatsappNumber: formData.whatsapp,
-        idLink: formData.idLink, // Add ID link for special offers
+        playerUID: formData.playerUID || '', // Always include, even if empty
+        gameUsername: formData.username || '', // Always include, even if empty
+        whatsappNumber: formData.whatsapp || '', // ✅ CRITICAL FIX: Always include this field
+        idLink: formData.idLink || '', // Always include, even if empty
         category: selectedItem.category,
         paymentMethod: 'meta_balance'
       };
 
       console.log('🛒 Sending purchase request:', purchaseData);
+
+      // ✅ Debug: Check if whatsappNumber is present
+      if (!purchaseData.whatsappNumber && selectedItem.category !== 'special-offers') {
+        console.error('❌ WhatsApp number is missing!');
+        throw new Error('WhatsApp number is required for this purchase');
+      }
 
       // ✅ Vercel proxy use korbe
       const response = await fetch(`/api/purchases`, {
@@ -244,6 +266,8 @@ Thank you for your purchase! 🎮`);
         alert('❌ User account not found! Please contact support.');
       } else if (error.message.includes('Network') || error.message.includes('Failed to fetch')) {
         alert('❌ Network error! Please check your internet connection and try again.');
+      } else if (error.message.includes('whatsappNumber') || error.message.includes('WhatsApp')) {
+        alert('❌ WhatsApp number error: ' + error.message);
       } else {
         alert(`❌ Error: ${error.message}`);
       }
@@ -272,7 +296,7 @@ Thank you for your purchase! 🎮`);
           buttonText: 'Subscribe Now',
           showGameFields: false,
           showIdLink: false,
-          showWhatsapp: true,
+          showWhatsapp: true, // ✅ WhatsApp required
           showEmail: true,
           description: 'Subscribe to premium service'
         };
@@ -282,7 +306,7 @@ Thank you for your purchase! 🎮`);
           buttonText: 'Purchase Now',
           showGameFields: true,
           showIdLink: false,
-          showWhatsapp: true,
+          showWhatsapp: true, // ✅ WhatsApp required
           showEmail: false,
           description: 'Game currency top-up'
         };
@@ -292,7 +316,7 @@ Thank you for your purchase! 🎮`);
           buttonText: 'Get This Deal',
           showGameFields: false,
           showIdLink: true,
-          showWhatsapp: false,
+          showWhatsapp: false, // ✅ WhatsApp NOT required for special offers
           showEmail: true,
           description: 'Special limited time offer'
         };
@@ -302,7 +326,7 @@ Thank you for your purchase! 🎮`);
           buttonText: 'Buy Now',
           showGameFields: false,
           showIdLink: false,
-          showWhatsapp: true,
+          showWhatsapp: true, // ✅ WhatsApp required by default
           showEmail: true,
           description: 'Product purchase'
         };
@@ -410,6 +434,7 @@ Thank you for your purchase! 🎮`);
                   <h4>Game Information:</h4>
                   <p><strong>UID:</strong> {formData.playerUID}</p>
                   <p><strong>Username:</strong> {formData.username}</p>
+                  <p><strong>WhatsApp:</strong> {formData.whatsapp}</p>
                 </div>
               )}
 
@@ -417,6 +442,13 @@ Thank you for your purchase! 🎮`);
                 <div className={styles.gameDetails}>
                   <h4>ID Link:</h4>
                   <p><strong>Link:</strong> {formData.idLink}</p>
+                </div>
+              )}
+
+              {(selectedItem.category === 'subscription' && formData.whatsapp) && (
+                <div className={styles.gameDetails}>
+                  <h4>Contact Information:</h4>
+                  <p><strong>WhatsApp:</strong> {formData.whatsapp}</p>
                 </div>
               )}
 
@@ -591,16 +623,16 @@ Thank you for your purchase! 🎮`);
               {categoryConfig.showEmail && (
                 <div className={styles.formGroup}>
                   <label htmlFor="email">Email Address *</label>
-                  <input
-                    type="email"
-                    id="email"
-                    name="email"
-                    value={formData.email}
-                    onChange={handleInputChange}
-                    placeholder="Enter your email"
-                    required
-                    disabled
-                  />
+                    <input
+                      type="email"
+                      id="email"
+                      name="email"
+                      value={formData.email}
+                      onChange={handleInputChange}
+                      placeholder="Enter your email"
+                      required
+                      disabled
+                    />
                   <small>This is your registered email</small>
                 </div>
               )}
@@ -614,10 +646,10 @@ Thank you for your purchase! 🎮`);
                     name="whatsapp"
                     value={formData.whatsapp}
                     onChange={handleInputChange}
-                    placeholder="Enter your WhatsApp number"
+                    placeholder="Enter your WhatsApp number with country code"
                     required
                   />
-                  <small>We'll contact you for confirmation</small>
+                  <small>We'll contact you for confirmation (e.g., +8801XXXXXXXXX)</small>
                 </div>
               )}
 
